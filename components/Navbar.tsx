@@ -2,21 +2,22 @@
 import React, { useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Menu, X, Sun, Moon, User, Building2, FileText, Code, LogIn, ChevronDown } from 'lucide-react';
+import { useAuth } from '@/context/authContext';
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  
-  // Mock auth state - replace with your auth solution
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [user, setUser] = useState({ name: 'John Doe', email: 'john@example.com' });
+  const router = useRouter()
+
+  const {user, signIn, signOut, isLoading, isSignedIn} = useAuth()
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);
 
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Building2 },
+    { name: 'Organizations', href: '/organization', icon: Building2 },
     { name: 'Forms', href: '/forms', icon: FileText },
     { name: 'Embed Code', href: '/embed', icon: Code },
     { name: 'Profile', href: '/profile', icon: User },
@@ -26,7 +27,7 @@ const Navbar = () => {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+        
           <div className="flex-shrink-0">
             <div className="flex items-center">
               <div className="bg-primary rounded-lg p-2">
@@ -38,7 +39,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-1">
               {isSignedIn && navItems.map((item) => {
@@ -57,9 +57,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Theme Toggle, User Button/Sign In & Mobile Menu Button */}
           <div className="flex items-center space-x-2">
-            {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10"
@@ -69,7 +67,6 @@ const Navbar = () => {
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </button>
 
-            {/* User Button or Sign In */}
             {isSignedIn ? (
               <div className="relative hidden md:block">
                 <button
@@ -79,7 +76,7 @@ const Navbar = () => {
                   <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
                     <User className="h-4 w-4 text-primary-foreground" />
                   </div>
-                  <span className="text-foreground font-medium">{user.name}</span>
+                  <span className="text-foreground font-medium">{user?.name}</span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
                 
@@ -87,8 +84,8 @@ const Navbar = () => {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-popover border rounded-md shadow-lg py-1 z-50">
                     <div className="px-4 py-2 border-b">
-                      <p className="text-sm font-medium text-foreground">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-sm font-medium text-foreground">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
                     </div>
                     <a href="/profile" className="block px-4 py-2 text-sm text-foreground hover:bg-accent">
                       Profile
@@ -98,7 +95,7 @@ const Navbar = () => {
                     </a>
                     <div className="border-t">
                       <button 
-                        onClick={() => setIsSignedIn(false)}
+                        onClick={() => signOut()}
                         className="block w-full text-left px-4 py-2 text-sm text-foreground hover:bg-accent"
                       >
                         Sign out
@@ -109,7 +106,7 @@ const Navbar = () => {
               </div>
             ) : (
               <button
-                onClick={() => setIsSignedIn(true)}
+                onClick={() => router.push('/sign-in')}
                 className="hidden md:inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
               >
                 <LogIn className="h-4 w-4 mr-2" />
@@ -146,14 +143,14 @@ const Navbar = () => {
                       <User className="h-4 w-4 text-primary-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-sm font-medium text-foreground">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
                     </div>
                   </div>
                 </div>
               ) : (
                 <button
-                  onClick={() => setIsSignedIn(true)}
+                  onClick={() => router.push('/sign-in')}
                   className="w-full flex items-center justify-center space-x-2 bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 mb-2"
                 >
                   <LogIn className="h-5 w-5" />
@@ -181,7 +178,7 @@ const Navbar = () => {
               {isSignedIn && (
                 <button
                   onClick={() => {
-                    setIsSignedIn(false);
+                    signOut();
                     setIsOpen(false);
                   }}
                   className="w-full text-left text-muted-foreground hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 border-t mt-2 pt-4"

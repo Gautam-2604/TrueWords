@@ -9,6 +9,8 @@ import {
   MessageSquare
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/authContext";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,8 +18,10 @@ const SignInPage = () => {
     email: "",
     password: "",
   });
+  const {signIn} = useAuth()
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -45,25 +49,33 @@ const SignInPage = () => {
   };
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    setIsLoading(true);
-    const response = await fetch('/api/auth/signin',{
-        method:'POST',
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify(formData)
-    })
-    if(response.ok){
-        toast.success('Sign in successful')
+  setIsLoading(true);
+
+  try {
+    const response = await signIn(formData.email, formData.password)
+
+    if (response.success) {
+      toast.success('Sign in successful');
+      router.push('/');
+    } else {
+      const errorData = response.error;
+      console.log(errorData);
+       
+      toast.error( 'Sign in failed. Please try again.');
     }
+  } catch (error) {
+    toast.error('An unexpected error occurred.');
+  } finally {
     setTimeout(() => {
       setIsLoading(false);
       console.log("Sign in:", formData);
     }, 2000);
-  };
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -195,7 +207,7 @@ const SignInPage = () => {
             {/* Sign Up Link */}
             <p className="text-center text-muted-foreground">
               Don't have an account?{" "}
-              <button className="text-primary hover:text-primary/80 font-semibold transition-colors">
+              <button className="text-primary hover:text-primary/80 font-semibold transition-colors" onClick={()=>router.push('/sign-up')}>
                 Sign up for free
               </button>
             </p>
