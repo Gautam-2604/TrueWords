@@ -1,35 +1,54 @@
-import React, { useState, useEffect } from 'react';
+'use client'
+import React from 'react';
+import { useTheme } from 'next-themes';
 import { Moon, Sun, Star, Users, Code, Zap, Play, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Timeline } from '@/components/ui/timeline';
+import { StepsTimeline } from '@/components/Steps';
+import { AnimatedTestimonials } from '@/components/ui/animated-testimonials';
 
 export default function HomePage() {
-  
-
+  const { theme, setTheme } = useTheme();
   
   const testimonials = [
     {
-      text: "This platform transformed how we collect customer feedback. Setup took just 5 minutes!",
-      author: "Sarah Chen",
-      role: "Marketing Director",
-      company: "TechFlow"
+      quote:
+        "The attention to detail and innovative features have completely transformed our workflow. This is exactly what we've been looking for.",
+      name: "Sarah Chen",
+      designation: "Product Manager at TechFlow",
+      src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=3560&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
-      text: "The code snippets work perfectly on our website. Our testimonial conversion rate increased by 300%.",
-      author: "Mike Rodriguez",
-      role: "Product Manager",
-      company: "StartupCo"
+      quote:
+        "Implementation was seamless and the results exceeded our expectations. The platform's flexibility is remarkable.",
+      name: "Michael Rodriguez",
+      designation: "CTO at InnovateSphere",
+      src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
-      text: "Beautiful, responsive displays and zero technical headaches. Exactly what we needed.",
-      author: "Emily Watson",
-      role: "Founder",
-      company: "DesignStudio"
-    }
+      quote:
+        "This solution has significantly improved our team's productivity. The intuitive interface makes complex tasks simple.",
+      name: "Emily Watson",
+      designation: "Operations Director at CloudScale",
+      src: "https://images.unsplash.com/photo-1623582854588-d60de57fa33f?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote:
+        "Outstanding support and robust features. It's rare to find a product that delivers on all its promises.",
+      name: "James Kim",
+      designation: "Engineering Lead at DataPro",
+      src: "https://images.unsplash.com/photo-1636041293178-808a6762ab39?q=80&w=3464&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote:
+        "The scalability and performance have been game-changing for our organization. Highly recommend to any growing business.",
+      name: "Lisa Thompson",
+      designation: "VP of Technology at FutureNet",
+      src: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?q=80&w=2592&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-white'}`}>
-      
-
+    <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-gray-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800"></div>
@@ -80,51 +99,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 bg-gray-50 dark:bg-gray-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Everything you need to collect testimonials
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              From collection to display, we've got you covered with powerful features that just work.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-800">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-6">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Smart Collection Forms</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Create beautiful forms that collect text, images, and video testimonials. Customizable to match your brand perfectly.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-800">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mb-6">
-                <Code className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">One-Click Embed</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Copy and paste our code snippets to display testimonials anywhere. Works with any website or platform.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-800">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mb-6">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Instant Setup</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Get started in minutes. Create your organization, design your form, and start collecting testimonials immediately.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <StepsTimeline />
+
 
       {/* Social Proof Section */}
       <section className="py-20">
@@ -138,48 +114,12 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                  "{testimonial.text}"
-                </p>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">{testimonial.author}</div>
-                  <div className="text-gray-500 dark:text-gray-400 text-sm">
-                    {testimonial.role} at {testimonial.company}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          
+            <AnimatedTestimonials testimonials={testimonials} />
+          
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-500 to-purple-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-            Ready to turn testimonials into growth?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses already collecting and showcasing customer testimonials with TestimonialHub.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg">
-              Start Free Trial
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-              View Pricing
-            </button>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
