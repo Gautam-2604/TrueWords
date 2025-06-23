@@ -13,3 +13,16 @@ export type Organization = {
   formsCount: number;
   testimonialsCount: number;
 };
+
+export type ProcessedTestimonialForm = {
+  id: string;
+  title: string;
+  description?: string;
+  organizationId: string;
+  organizationName: string;
+  allowedTypes: ('text' | 'image' | 'video')[];
+  slug: string;
+  responsesCount: number;
+  createdAt: string; // ISO string
+  isActive: boolean;
+};

@@ -11,6 +11,8 @@ const testimonialFormSchema = new mongoose.Schema({
     thankYouMessage: String
   },
   slug: { type: String, unique: true },
+  responsesCount: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
 export const TestimonialForm = mongoose.models.TestimonialForm || mongoose.model('TestimonialForm', testimonialFormSchema);
