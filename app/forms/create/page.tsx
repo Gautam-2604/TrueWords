@@ -28,7 +28,19 @@ const CreateFormPage = () => {
 
   useEffect(() => {
     if (!user?.id) return;
-    setOrganizations(user.organizations || []);
+    const getOrgs = async()=>{
+    const orgs = await fetch(`/api/organization?userId=${user.id}`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const data = await orgs.json();
+    setOrganizations(Array.isArray(data.orgs) ? data.orgs : []);
+  }
+
+  getOrgs()
+    
   }, [user?.id, isLoading]);
 
   const handleTypeToggle = (type: string) => {
@@ -63,7 +75,7 @@ const CreateFormPage = () => {
       }
 
       const result = await response.json();
-      router.push(`/dashboard/forms/${result.data.slug}`);
+      router.push(`/forms/${result.data.slug}`);
     } catch (error) {
       console.error('Error creating form:', error);
     } finally {

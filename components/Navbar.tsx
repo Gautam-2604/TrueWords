@@ -19,7 +19,6 @@ const Navbar = () => {
   const navItems = [
     { name: 'Organizations', href: '/organization', icon: Building2 },
     { name: 'Forms', href: '/forms', icon: FileText },
-    { name: 'Embed Code', href: '/embed', icon: Code },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 

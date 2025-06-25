@@ -3,12 +3,14 @@ import { useAuth } from "@/context/authContext";
 import { Organization, ProcessedTestimonialForm } from "@/lib/types";
 import { Copy, ExternalLink, Eye, FileText, MoreVertical, Plus, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const FormsDashboard = () => {
   const [selectedOrg, setSelectedOrg] = useState('');
   const [forms, setForms] = useState<ProcessedTestimonialForm[]>([]) // Initialize as empty array
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [isLoadingForms, setIsLoadingForms] = useState(true);
+  const navigate = useRouter()
   
   const { user,isLoading} = useAuth();
 
@@ -18,10 +20,18 @@ const FormsDashboard = () => {
       return;
     }
 
-    setOrganizations(user.organizations || []);
+    
     
     const getForms = async () => {
   try {
+    const orgs = await fetch(`/api/organization?userId=${user.id}`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const data = await orgs.json();
+    setOrganizations(Array.isArray(data.orgs) ? data.orgs : []);
     setIsLoadingForms(true);
     const response = await fetch(`/api/forms?userId=${user.id}`, {
       method: 'GET',
@@ -39,12 +49,10 @@ const FormsDashboard = () => {
     
     let formsArray = [];
     
-    // Handle the nested structure your API returns
     if (responseData.data && Array.isArray(responseData.data)) {
-      // Flatten the nested structure
+      
       formsArray = responseData.data.reduce((allForms: any, orgData: { forms: any[]; organizationName: any; }) => {
         if (orgData.forms && Array.isArray(orgData.forms)) {
-          // Add organizationName to each form
           const formsWithOrgName = orgData.forms.map((form: any) => ({
             ...form,
             organizationName: orgData.organizationName
@@ -172,6 +180,7 @@ const FormsDashboard = () => {
               <button 
                 className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
                 disabled={!selectedOrg}
+                onClick={()=>navigate.push('/forms/create')}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Form
