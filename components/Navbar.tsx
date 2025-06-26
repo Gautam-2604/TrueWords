@@ -26,17 +26,20 @@ const Navbar = () => {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-        
+        <button className='cursor-pointer' onClick={()=>router.push('/')}>
           <div className="flex-shrink-0">
             <div className="flex items-center">
+              
               <div className="bg-primary rounded-lg p-2">
                 <FileText className="h-6 w-6 text-primary-foreground" />
               </div>
               <span className="ml-2 text-xl font-bold text-foreground">
                 TrueWords
               </span>
+              
             </div>
           </div>
+          </button>
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-1">
@@ -164,7 +167,7 @@ const Navbar = () => {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-muted-foreground hover:bg-accent hover:text-accent-foreground block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 flex items-center space-x-2"
+                    className="text-muted-foreground hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 flex items-center space-x-2"
                     onClick={() => setIsOpen(false)}
                   >
                     <Icon className="h-5 w-5" />

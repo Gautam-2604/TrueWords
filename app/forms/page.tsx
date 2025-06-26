@@ -135,7 +135,12 @@ const FormsDashboard = () => {
       image: '🖼️',
       video: '🎥'
     };
-    return types.map((type: string | number) => iconMap[type] || '❓').join(' ');
+    return types.map((type: string | number) => {
+      if (typeof type === 'string' && type in iconMap) {
+        return iconMap[type as keyof typeof iconMap];
+      }
+      return '❓';
+    }).join(' ');
   };
 
   const copyEmbedCode = (slug: string) => {
@@ -224,9 +229,11 @@ const FormsDashboard = () => {
               <div key={form.id} className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
+                    <button onClick={()=>navigate.push(`/forms/${form.slug}`)}>
                     <h3 className="text-lg font-semibold text-foreground mb-1">
                       {form.title}
                     </h3>
+                    </button>
                     <p className="text-sm text-muted-foreground mb-2">
                       {form.organizationName}
                     </p>

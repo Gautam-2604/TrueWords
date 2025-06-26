@@ -40,6 +40,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'No User' }, { status: 400 });
     }
 
+    console.log(userId, "UserId");
+    
+
     await dbConnect();
 
     const organizations = await Organization.find({ owner: userId });

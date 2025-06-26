@@ -1,60 +1,71 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { 
-  User, 
-  Building, 
-  Calendar, 
-  Mail, 
+import { useState, useEffect } from "react";
+import {
+  User,
+  Building,
+  Calendar,
+  Mail,
   Settings,
   Edit,
   LogOut,
-  Shield
-} from 'lucide-react';
-import { useAuth } from '@/context/authContext';
-import { Organization } from '@/lib/types';
+  Shield,
+} from "lucide-react";
+import { useAuth } from "@/context/authContext";
+import { Organization } from "@/lib/types";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [orgs, setOrgs] = useState<Organization[]>([])
-  const {user} = useAuth()
+  const [orgs, setOrgs] = useState<Organization[]>([]);
+  const { user, signOut} = useAuth();
 
-  useEffect(()=>{
-    const getOrgs = async()=>{
-        const response = await fetch(`/api/organization?userId=${user?.id}`,{
-            method:'GET',
-            headers:{
-                "Content-Type":"application/json"
-            }
-        })
+  useEffect(() => {
+    const getOrgs = async () => {
+      console.log(user?.id, "ID");
 
-        const data = await response.json()
-        setOrgs(data)
-    }
-    getOrgs()
-  },[])
-  
+      const response = await fetch(`/api/organization?userId=${user?.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
+      const data = await response.json();
+      console.log(data, "DATA");
+
+      if (data.orgs) {
+        setOrgs(data.orgs);
+      } else {
+        setOrgs([]);
+      }
+      console.log(orgs, "ORGS");
+
+      setLoading(false);
+    };
+    getOrgs();
+  }, [user?.id]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    // Redirect to login page
-    window.location.href = '/login';
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    signOut()
+    window.location.href = "/login";
   };
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200`}>
+      <div
+        className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200`}
+      >
         <div className="max-w-4xl mx-auto p-6">
           <div className="animate-pulse">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -74,13 +85,15 @@ export default function ProfilePage() {
 
   if (error) {
     return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 flex items-center justify-center`}>
+      <div
+        className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 flex items-center justify-center`}
+      >
         <div className="text-center">
           <div className="text-red-500 dark:text-red-400 text-lg font-medium mb-2">
             Error Loading Profile
           </div>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -93,7 +106,9 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 flex items-center justify-center  `}>
+      <div
+        className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 flex items-center justify-center  `}
+      >
         <div className="text-center">
           <div className="text-gray-500 dark:text-gray-400 text-lg">
             No user data available
@@ -104,14 +119,16 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200  `}>
+    <div
+      className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200  `}
+    >
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Profile
           </h1>
-          
+
           {/* Actions */}
           <div className="flex items-center space-x-4">
             <button
@@ -133,7 +150,7 @@ export default function ProfilePage() {
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                   <User className="w-10 h-10 text-white" />
                 </div>
-                
+
                 {/* User Info */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
@@ -149,7 +166,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Edit Button */}
               <button className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-600">
                 <Edit className="w-4 h-4" />
@@ -167,32 +184,44 @@ export default function ProfilePage() {
                 <Building className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Organizations</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{user.organizations.length}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Organizations
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {orgs.length}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center">
               <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
                 <Shield className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Account Status</p>
-                <p className="text-lg font-semibold text-green-600 dark:text-green-400">Active</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Account Status
+                </p>
+                <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                  Active
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center">
               <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Last Updated</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{formatDate(user.updatedAt)}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Last Updated
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {formatDate(user.updatedAt)}
+                </p>
               </div>
             </div>
           </div>
@@ -210,7 +239,7 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
-          
+
           <div className="p-6">
             {orgs.length > 0 ? (
               <div className="space-y-4">
@@ -237,7 +266,7 @@ export default function ProfilePage() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                       <Settings className="w-4 h-4" />
                     </button>
@@ -268,29 +297,35 @@ export default function ProfilePage() {
               Account Settings
             </h3>
           </div>
-          
+
           <div className="p-6">
             <div className="space-y-4">
               <button className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
                 <div className="flex items-center space-x-3">
                   <Settings className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">General Settings</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    General Settings
+                  </span>
                 </div>
                 <span className="text-gray-400">→</span>
               </button>
-              
+
               <button className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
                 <div className="flex items-center space-x-3">
                   <Shield className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">Privacy & Security</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    Privacy & Security
+                  </span>
                 </div>
                 <span className="text-gray-400">→</span>
               </button>
-              
+
               <button className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">Email Preferences</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    Email Preferences
+                  </span>
                 </div>
                 <span className="text-gray-400">→</span>
               </button>
