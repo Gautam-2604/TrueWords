@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star } from 'lucide-react'
+import { Star, Upload, X, Image, Video } from 'lucide-react'
 
 interface FormData {
   _id: string
@@ -17,255 +17,350 @@ interface FormData {
   isActive: boolean
 }
 
-interface TestimonialFormProps {
+interface TestimonialEmbedProps {
   form: FormData
-  isEmbedded?: boolean
 }
 
-export default function TestimonialForm({ form, isEmbedded = false }: TestimonialFormProps) {
+export default function TestimonialEmbed({ form }: TestimonialEmbedProps) {
   const [rating, setRating] = useState(5)
   const [testimonial, setTestimonial] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [company, setCompany] = useState('')
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [hoveredStar, setHoveredStar] = useState(0)
 
   const primaryColor = form.branding.primaryColor || '#6366F1'
+  const hasImageUpload = form.allowedTypes.includes('image')
+  const hasVideoUpload = form.allowedTypes.includes('video')
+  const hasUpload = hasImageUpload || hasVideoUpload
 
-  // Mock form data for demo
-  const mockForm = {
-    _id: '1',
-    title: 'Share Your Experience',
-    description: 'Help others discover our amazing service by sharing your honest feedback',
-    slug: 'demo-form',
-    allowedTypes: ['text'],
-    branding: {
-      logoUrl: 'https://via.placeholder.com/120x40/6366F1/FFFFFF?text=LOGO',
-      primaryColor: '#6366F1',
-      thankYouMessage: 'Thank you for your valuable feedback! We truly appreciate you taking the time to share your experience.'
-    },
-    isActive: true
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const validFiles = files.filter(file => {
+      if (hasImageUpload && file.type.startsWith('image/')) return true
+      if (hasVideoUpload && file.type.startsWith('video/')) return true
+      return false
+    })
+    
+    setUploadedFiles(prev => [...prev, ...validFiles])
   }
 
-  const activeForm = form || mockForm
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const getAcceptedTypes = () => {
+    const types = []
+    if (hasImageUpload) types.push('image/*')
+    if (hasVideoUpload) types.push('video/*')
+    return types.join(',')
+  }
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsSubmitted(true)
-      
-      if (isEmbedded && window.parent !== window) {
-        window.parent.postMessage({
-          type: 'testimonial_submitted',
-          data: { formSlug: activeForm.slug }
-        }, '*')
-      }
-    } catch (error) {
-      console.error('Error submitting testimonial:', error)
-    } finally {
-      setIsSubmitting(false)
+  const getUploadLabel = () => {
+    if (hasImageUpload && hasVideoUpload) return 'Upload images or videos'
+    if (hasImageUpload) return 'Upload images'
+    if (hasVideoUpload) return 'Upload videos'
+    return 'Upload files'
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  // Updated handleSubmit function for your TestimonialEmbed component
+
+const handleSubmit = async () => {
+  // Validate required fields
+  if (!name.trim() || !email.trim() || !testimonial.trim()) {
+    alert('Please fill in all required fields');
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    // Create FormData for file uploads
+    const formData = new FormData();
+    
+    // Add form fields
+    formData.append('formId', form._id);
+    formData.append('name', name.trim());
+    formData.append('email', email.trim());
+    formData.append('testimonial', testimonial.trim());
+    formData.append('rating', rating.toString());
+    
+    if (company.trim()) {
+      formData.append('company', company.trim());
     }
+
+    // Add uploaded files
+    uploadedFiles.forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        formData.append('image', file);
+      } else if (file.type.startsWith('video/')) {
+        formData.append('video', file);
+      }
+    });
+
+    // Submit to API
+    const response = await fetch('/api/testimonials/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to submit testimonial');
+    }
+
+    setIsSubmitted(true);
+    
+    // Post message to parent window if embedded
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        type: 'testimonial_submitted',
+        data: { 
+          formSlug: form.slug,
+          testimonialId: result.id
+        }
+      }, '*');
+    }
+
+  } catch (error) {
+    console.error('Error submitting testimonial:', error);
+    alert(error.message || 'Failed to submit testimonial. Please try again.');
+  } finally {
+    setIsSubmitting(false);
   }
+};
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 text-center border border-white/20">
-            <div className="relative mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-lg transform animate-bounce">
-                <span className="text-3xl text-white">✓</span>
-              </div>
-              <div className="absolute inset-0 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mx-auto opacity-20 animate-ping"></div>
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center border">
+          <div className="relative mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-md">
+              <span className="text-2xl text-white">✓</span>
             </div>
-            
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
-              Thank you!
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              {activeForm.branding.thankYouMessage || 'Your testimonial has been submitted successfully.'}
-            </p>
           </div>
+          
+          <h3 className="text-xl font-bold text-gray-900 mb-3">
+            Thank you!
+          </h3>
+          <p className="text-gray-600 text-sm">
+            {form.branding.thankYouMessage || 'Your testimonial has been submitted successfully.'}
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 py-12 px-4">
-      <div className="max-w-lg mx-auto">
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-          <div className="p-8">
-            <div className="space-y-8">
-              {/* Header */}
-              <div className="text-center space-y-4">
-                {activeForm.branding.logoUrl && (
-                  <div className="mb-6">
-                    <img 
-                      src={activeForm.branding.logoUrl} 
-                      alt="Logo" 
-                      className="h-10 mx-auto opacity-90 hover:opacity-100 transition-opacity duration-300"
+    <div className="w-full max-w-lg mx-auto">
+      <div className="bg-white rounded-2xl shadow-lg border overflow-hidden">
+        <div className="p-6">
+          {/* Header */}
+          <div className="text-center mb-6">
+            {form.branding.logoUrl && (
+              <div className="mb-4">
+                <img 
+                  src={form.branding.logoUrl} 
+                  alt="Logo" 
+                  className="h-8 mx-auto"
+                />
+              </div>
+            )}
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              {form.title}
+            </h2>
+            {form.description && (
+              <p className="text-gray-600 text-sm">
+                {form.description}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            {/* Rating */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rate your experience
+              </label>
+              <div className="flex gap-1 justify-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredStar(star)}
+                    onMouseLeave={() => setHoveredStar(0)}
+                    className="p-1 rounded transition-colors"
+                  >
+                    <Star
+                      className={`w-6 h-6 ${
+                        star <= (hoveredStar || rating)
+                          ? 'fill-current text-yellow-400' 
+                          : 'text-gray-300'
+                      }`}
                     />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Testimonial */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Your testimonial
+              </label>
+              <textarea
+                value={testimonial}
+                onChange={(e) => setTestimonial(e.target.value)}
+                rows={3}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 resize-none text-black"
+                placeholder="Share your experience..."
+              />
+            </div>
+
+            {/* Upload Section */}
+            {hasUpload && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {getUploadLabel()} <span className="text-gray-400">(optional)</span>
+                </label>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                  <input
+                    type="file"
+                    multiple
+                    accept={getAcceptedTypes()}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <div className="flex flex-col items-center">
+                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-600 mb-1">
+                        Click to upload or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {hasImageUpload && hasVideoUpload ? 'Images and videos' : 
+                         hasImageUpload ? 'Images only' : 'Videos only'}
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Uploaded Files */}
+                {uploadedFiles.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center gap-2">
+                          {file.type.startsWith('image/') ? (
+                            <Image className="w-4 h-4 text-blue-500" />
+                          ) : (
+                            <Video className="w-4 h-4 text-purple-500" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {formatFileSize(file.size)}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                        >
+                          <X className="w-4 h-4 text-gray-500" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
-                
-                <div className="space-y-3">
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
-                    {activeForm.title}
-                  </h1>
-                  {activeForm.description && (
-                    <p className="text-gray-600 text-lg leading-relaxed">
-                      {activeForm.description}
-                    </p>
-                  )}
-                </div>
               </div>
+            )}
 
-              {/* Rating */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-800">
-                  How would you rate your experience?
-                </label>
-                <div className="flex gap-2 justify-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      onMouseEnter={() => setHoveredStar(star)}
-                      onMouseLeave={() => setHoveredStar(0)}
-                      className="p-2 rounded-full hover:bg-yellow-50 transition-all duration-200 transform hover:scale-110"
-                    >
-                      <Star
-                        className={`w-8 h-8 transition-all duration-200 ${
-                          star <= (hoveredStar || rating)
-                            ? 'fill-current text-yellow-400 drop-shadow-sm' 
-                            : 'text-gray-300 hover:text-yellow-200'
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-                <p className="text-center text-sm text-gray-500">
-                  {rating === 5 ? '🌟 Excellent!' : 
-                   rating === 4 ? '😊 Great!' : 
-                   rating === 3 ? '👍 Good!' : 
-                   rating === 2 ? '😐 Fair' : '😞 Poor'}
-                </p>
-              </div>
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-black"
+                placeholder="Your name"
+              />
+            </div>
 
-              {/* Testimonial */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Share your experience
-                </label>
-                <div className="relative">
-                  <textarea
-                    value={testimonial}
-                    onChange={(e) => setTestimonial(e.target.value)}
-                    rows={4}
-                    required
-                    className="w-full px-4 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all duration-300 resize-none placeholder-gray-400"
-                    placeholder="Tell us about your experience and what made it special..."
-                  />
-                  <div className="absolute bottom-3 right-3 text-xs text-gray-400">
-                    {testimonial.length}/500
-                  </div>
-                </div>
-              </div>
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-black"
+                placeholder="your@email.com"
+              />
+            </div>
 
-              {/* Personal Information */}
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-800">
-                    Your name
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="w-full px-4 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all duration-300 placeholder-gray-400"
-                    placeholder="John Doe"
-                  />
-                </div>
+            {/* Company */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Company <span className="text-gray-400">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-black"
+                placeholder="Your company"
+              />
+            </div>
 
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-800">
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="w-full px-4 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all duration-300 placeholder-gray-400"
-                    placeholder="john@example.com"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-800">
-                    Company <span className="text-gray-400 font-normal">(optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    className="w-full px-4 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all duration-300 placeholder-gray-400"
-                    placeholder="Acme Corporation"
-                  />
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit}>
-                {/* Submit Button */}
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group"
-                    style={{ 
-                      background: isSubmitting 
-                        ? 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%)'
-                        : `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}CC 100%)`
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Submitting your testimonial...
-                        </>
-                      ) : (
-                        <>
-                          Submit Testimonial
-                          <span className="text-xl">✨</span>
-                        </>
-                      )}
-                    </span>
-                  </button>
-                </div>
-              </form>
-            
+            {/* Submit Button */}
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ 
+                backgroundColor: isSubmitting ? '#9CA3AF' : primaryColor
+              }}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Submitting...
+                </span>
+              ) : (
+                'Submit Testimonial'
+              )}
+            </button>
           </div>
         </div>
-        
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-gray-500">
-            Your feedback helps us improve and helps others make informed decisions
-          </p>
-        </div>
       </div>
-    </div>
     </div>
   )
 }

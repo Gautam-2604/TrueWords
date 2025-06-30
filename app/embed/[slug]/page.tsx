@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { notFound } from 'next/navigation'
 import TestimonialForm from '@/components/TestimonialForm'
 import EmbedWrapper from '@/components/EmbedWrapper'
@@ -9,27 +10,55 @@ interface EmbedPageProps {
   }
 }
 
-async function getFormData(slug: string) {
-  try {
-    const response = await fetch(`http://localhost:3000/api/forms/${slug}`, {
-      next: { revalidate: 60 } // Cache for 1 minute
-    })
-    
-    if (!response.ok) {
-      return null
-    }
-    
-    return await response.json()
-  } catch (error) {
-    console.error('Error fetching form data:', error)
-    return null
-  }
-}
+export default function EmbedPage({ params }: EmbedPageProps) {
+  const [form, setForm] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-export default async function EmbedPage({ params }: EmbedPageProps) {
-  const form = await getFormData(params.slug)
-  
-  if (!form) {
+  useEffect(() => {
+    let isMounted = true
+
+    async function fetchFormData() {
+      try {
+        const response = await fetch(`/api/forms/${params.slug}`)
+        
+        if (!response.ok) {
+          if (isMounted) {
+            setError(true)
+            setLoading(false)
+          }
+          return
+        }
+        
+        const data = await response.json()
+        console.log(data);
+        
+        
+        if (isMounted) {
+          setForm(data)
+          setLoading(false)
+        }
+      } catch (err) {
+        console.error('Error fetching form data:', err)
+        if (isMounted) {
+          setError(true)
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchFormData()
+
+    return () => {
+      isMounted = false
+    }
+  }, [params.slug])
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (error || !form) {
     notFound()
   }
 
@@ -37,9 +66,7 @@ export default async function EmbedPage({ params }: EmbedPageProps) {
     <EmbedWrapper>
       <TestimonialForm 
         form={form}
-        isEmbedded={true}
       />
     </EmbedWrapper>
   )
 }
-
