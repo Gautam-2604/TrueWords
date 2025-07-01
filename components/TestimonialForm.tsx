@@ -2,23 +2,12 @@
 
 import { useState } from 'react'
 import { Star, Upload, X, Image, Video } from 'lucide-react'
+import { CustomFormData } from '@/common/types'
 
-interface FormData {
-  _id: string
-  title: string
-  description: string
-  slug: string
-  allowedTypes: string[]
-  branding: {
-    logoUrl?: string
-    primaryColor?: string
-    thankYouMessage?: string
-  }
-  isActive: boolean
-}
+
 
 interface TestimonialEmbedProps {
-  form: FormData
+  form: CustomFormData
 }
 
 export default function TestimonialEmbed({ form }: TestimonialEmbedProps) {
@@ -89,7 +78,6 @@ const handleSubmit = async () => {
     // Create FormData for file uploads
     const formData = new FormData();
     
-    // Add form fields
     formData.append('formId', form._id);
     formData.append('name', name.trim());
     formData.append('email', email.trim());
@@ -123,7 +111,6 @@ const handleSubmit = async () => {
 
     setIsSubmitted(true);
     
-    // Post message to parent window if embedded
     if (window.parent !== window) {
       window.parent.postMessage({
         type: 'testimonial_submitted',
