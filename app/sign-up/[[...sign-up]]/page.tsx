@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, MessageSquare, Image, Video, FileText, Check } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, MessageSquare, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -18,13 +18,13 @@ const SignUpPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const handleInputChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  setFormData(prev => ({ ...prev, [name]: value }));
+  if (errors[name as keyof typeof errors]) {
+    setErrors(prev => ({ ...prev, [name]: '' }));
+  }
+};
 
   const validateForm = () => {
     const newErrors = {};
@@ -63,30 +63,30 @@ const SignUpPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    
-    setIsLoading(true);
-    const response = await fetch('/api/auth/signup',{
-        method:'POST',
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify(formData)
-    })
-    if (response.ok) {
-          toast.success('Sign in successful');
-          router.push('/');
-        } else {
-          const errorData = await response.json(); 
-          toast.error(errorData.message || 'Sign in failed. Please try again.');
-        }
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Sign up:', formData);
-    }, 2000);
-  };
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  e.preventDefault();
+  if (!validateForm()) return;
+  
+  setIsLoading(true);
+  const response = await fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData)
+  });
+  if (response.ok) {
+    toast.success('Sign in successful');
+    router.push('/');
+  } else {
+    const errorData = await response.json();
+    toast.error(errorData.message || 'Sign in failed. Please try again.');
+  }
+  setTimeout(() => {
+    setIsLoading(false);
+    console.log('Sign up:', formData);
+  }, 2000);
+};
 
   const getPasswordStrength = () => {
     const password = formData.password;

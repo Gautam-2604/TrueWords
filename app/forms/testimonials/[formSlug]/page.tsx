@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, Filter, Search, Eye, Check, X, Trash2, Image, Video, Calendar, User, Mail, Building } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Search, Check, X, Trash2, Image, Video, Calendar} from 'lucide-react';
 
 type Testimonial = {
   _id: string;
@@ -22,7 +22,9 @@ const TestimonialDisplay = () => {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10
+    itemsPerPage: 10,
+    hasNextPage: false,
+    hasPrevPage: false
   });
   
   // Filters
@@ -39,8 +41,6 @@ const TestimonialDisplay = () => {
   const [selectedTestimonials, setSelectedTestimonials] = useState<string[]>([]);
   const [bulkAction, setBulkAction] = useState('');
   
-  // Stats
-  const [stats, setStats] = useState<any>(null);
   
   // View mode
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // 'grid' or 'list'
@@ -78,7 +78,7 @@ const TestimonialDisplay = () => {
 
 
   // Update testimonial approval status
-  const updateApprovalStatus = async (id: any, approved: boolean) => {
+  const updateApprovalStatus = async (id: string, approved: boolean) => {
     try {
       const response = await fetch(`/api/testimonials/${id}`, {
         method: 'PUT',
@@ -96,7 +96,7 @@ const TestimonialDisplay = () => {
   };
 
   // Delete testimonial
-  const deleteTestimonial = async (id: any) => {
+  const deleteTestimonial = async (id: string) => {
     if (!confirm('Are you sure you want to delete this testimonial?')) return;
     
     try {

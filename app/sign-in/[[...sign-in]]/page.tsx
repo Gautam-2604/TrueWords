@@ -23,7 +23,7 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -48,14 +48,14 @@ const SignInPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: any) => {
+const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
   e.preventDefault();
   if (!validateForm()) return;
 
   setIsLoading(true);
 
   try {
-    const response = await signIn(formData.email, formData.password)
+    const response = await signIn(formData.email, formData.password);
 
     if (response.success) {
       toast.success('Sign in successful');
@@ -63,11 +63,13 @@ const SignInPage = () => {
     } else {
       const errorData = response.error;
       console.log(errorData);
-       
-      toast.error( 'Sign in failed. Please try again.');
+
+      toast.error('Sign in failed. Please try again.');
     }
   } catch (error) {
     toast.error('An unexpected error occurred.');
+    console.log(error);
+
   } finally {
     setTimeout(() => {
       setIsLoading(false);
@@ -206,7 +208,7 @@ const SignInPage = () => {
 
             {/* Sign Up Link */}
             <p className="text-center text-muted-foreground">
-              Don't have an account?{" "}
+              Dont have an account?{" "}
               <button className="text-primary hover:text-primary/80 font-semibold transition-colors" onClick={()=>router.push('/sign-up')}>
                 Sign up for free
               </button>

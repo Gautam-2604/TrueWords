@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Plus, Building2, Users, Calendar, MoreVertical, Edit3, Trash2, Star } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Plus, Building2, Users, MoreVertical,  Star } from 'lucide-react';
 import { Organization } from '@/lib/types';
 import { useAuth } from '@/context/authContext';
 import { toast } from 'sonner';
@@ -14,7 +13,6 @@ const OrganizationsDashboard = () => {
   const {user} = useAuth()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false);
-  const { theme } = useTheme();
 
   
 useEffect(() => {

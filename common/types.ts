@@ -12,7 +12,16 @@ export type CustomFormData = {
   slug: string;
   allowedTypes: string[];
   branding: Branding;
+   responsesCount: number;
   isActive: boolean;
+  organization: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+
+  createdAt: string;
+  updatedAt: string;
 };
 
 

@@ -2,40 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useTheme } from 'next-themes';
 import { Copy, Eye, Settings, Code, ExternalLink, BarChart3, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { CustomFormData } from '@/common/types';
 
-interface FormData {
-  _id: string;
-  title: string;
-  description: string;
-  slug: string;
-  allowedTypes: string[];
-  branding: {
-    logoUrl?: string;
-    primaryColor?: string;
-    thankYouMessage?: string;
-  };
-  responsesCount: number;
-  isActive: boolean;
-  organization: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
 
 export default function FormDetailsPage() {
   const params = useParams();
   const slug = params?.slug as string;
   const navigate = useRouter()
-  const { theme } = useTheme();
   
-  const [form, setForm] = useState<FormData | null>(null);
+  const [form, setForm] = useState<CustomFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'embed' | 'responses'>('overview');

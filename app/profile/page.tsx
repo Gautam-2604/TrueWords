@@ -16,7 +16,7 @@ import { Organization } from "@/lib/types";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error,] = useState<string | null>(null);
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const { user, signOut} = useAuth();
 
@@ -280,7 +280,7 @@ export default function ProfilePage() {
                   No organizations yet
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  You haven't joined any organizations yet.
+                  You havent joined any organizations yet.
                 </p>
                 <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   Create Organization

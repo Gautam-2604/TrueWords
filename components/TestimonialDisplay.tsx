@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, Play, User, Building2, Quote } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Play, User, Quote } from 'lucide-react';
 import { CustomFormData, TestimonialResponse } from '@/common/types';
 
 const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBaseUrl: string}) => {
@@ -47,14 +47,14 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBas
     }
   };
 
-  const renderStars = (rating = 5) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-      />
-    ));
-  };
+  // const renderStars = (rating = 5) => {
+  //   return Array.from({ length: 5 }, (_, i) => (
+  //     <Star
+  //       key={i}
+  //       className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+  //     />
+  //   ));
+  // };
 
   const openModal = (testimonial: TestimonialResponse) => {
     setSelectedTestimonial(testimonial);
@@ -127,7 +127,7 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBas
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-        {testimonials.map((testimonial, index) => (
+        {testimonials.map((testimonial) => (
           <div
             key={testimonial._id}
             className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer border border-gray-100 hover:border-indigo-200"

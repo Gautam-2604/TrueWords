@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useTheme } from 'next-themes';
 import { 
   Save, 
   ArrowLeft, 
   Eye, 
   Palette, 
   Settings, 
-  Globe, 
   Mail,
   MessageSquare,
   Video,
@@ -17,28 +15,8 @@ import {
   Loader2,
   Trash2
 } from 'lucide-react';
+import { CustomFormData } from '@/common/types';
 
-interface FormData {
-  _id: string;
-  title: string;
-  description: string;
-  slug: string;
-  allowedTypes: string[];
-  branding: {
-    logoUrl?: string;
-    primaryColor?: string;
-    thankYouMessage?: string;
-  };
-  responsesCount: number;
-  isActive: boolean;
-  organization: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
 
 const RESPONSE_TYPES = [
   { id: 'text', label: 'Text', icon: MessageSquare },
@@ -56,9 +34,8 @@ export default function EditFormPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
-  const { theme } = useTheme();
   
-  const [form, setForm] = useState<FormData | null>(null);
+  const [form, setForm] = useState<CustomFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,15 +97,15 @@ export default function EditFormPage() {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setUnsavedChanges(true);
-  };
+  const handleInputChange = (field: string, value: string | string[] | boolean) => {
+      setFormData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+      setUnsavedChanges(true);
+    };
 
-  const handleBrandingChange = (field: string, value: any) => {
+  const handleBrandingChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       branding: {
@@ -238,7 +215,7 @@ export default function EditFormPage() {
             {error || 'Form not found'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            The form you're trying to edit doesn't exist or has been removed.
+            The form you are trying to edit does not exist or has been removed.
           </p>
           <button 
             onClick={() => router.push('/forms')}
@@ -353,7 +330,7 @@ export default function EditFormPage() {
                       />
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      This will be part of your form's URL
+                      This will be part of your forms URL
                     </p>
                   </div>
                 </div>
@@ -477,7 +454,7 @@ export default function EditFormPage() {
                   <span className="text-gray-700 dark:text-gray-300">Form is active</span>
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  When inactive, the form won't accept new submissions
+                  When inactive, the form wont accept new submissions
                 </p>
               </div>
 

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { useTheme } from 'next-themes';
-import { Menu, X, Sun, Moon, User, Building2, FileText, Code, LogIn, ChevronDown } from 'lucide-react';
+import { Menu, X, Sun, Moon, User, Building2, FileText, LogIn, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/authContext';
 import { useRouter } from 'next/navigation';
 
@@ -11,7 +11,7 @@ const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const router = useRouter()
 
-  const {user, signIn, signOut, isLoading, isSignedIn} = useAuth()
+  const {user, signOut, isSignedIn} = useAuth()
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);

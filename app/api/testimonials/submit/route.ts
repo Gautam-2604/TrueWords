@@ -14,7 +14,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 
-async function handleFileUpload(file: { filepath: any; originalFilename: any; mimetype?: string; }) {
+async function handleFileUpload(file: { filepath: string; originalFilename: string; mimetype?: string; }) {
   if (!file) return null;
 
   const fileExtension = path.extname(file.originalFilename || '');

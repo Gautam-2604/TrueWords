@@ -4,7 +4,6 @@ import {
   Building2, 
   Users, 
   Star, 
-  Calendar, 
   Settings, 
   Plus, 
   Edit3, 
@@ -13,14 +12,12 @@ import {
   BarChart3,
   FileText,
   MessageSquare,
-  TrendingUp,
   UserPlus,
   Mail,
   Phone,
   Globe,
   MapPin
 } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/authContext';
 import { toast } from 'sonner';
@@ -73,7 +70,6 @@ const OrganizationDetail = () => {
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const { theme } = useTheme();
   const router = useRouter();
   const params = useParams();
   const { user } = useAuth();

@@ -13,8 +13,7 @@ const generateSlug = (title: string) => {
     .trim();
 };
 
-// Check if slug is unique and generate a new one if needed
-const ensureUniqueSlug = async (baseSlug: any) => {
+const ensureUniqueSlug = async (baseSlug: string) => {
   let slug = baseSlug;
   let counter = 1;
   
@@ -26,7 +25,7 @@ const ensureUniqueSlug = async (baseSlug: any) => {
   return slug;
 };
 
-export async function POST(request: { json: () => any; }) {
+export async function POST(request: Request) {
   try {
     await dbConnect();
     

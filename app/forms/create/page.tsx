@@ -1,7 +1,7 @@
 'use client'
 import { useAuth } from "@/context/authContext";
 import { Organization } from "@/lib/types";
-import { ArrowLeft, Check, Copy, Eye, FileText, Image, MessageSquare, Palette, Plus, Video, Wand2 } from "lucide-react";
+import { ArrowLeft, Check, Eye, FileText, Image, MessageSquare, Palette, Plus, Video, Wand2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -394,7 +394,7 @@ const CreateFormPage = () => {
 
                   {/* Preview Content Types */}
                   <div className="space-y-3 mb-6">
-                    <p className="text-sm font-medium text-foreground">Choose how you'd like to share your testimonial:</p>
+                    <p className="text-sm font-medium text-foreground">Choose how you would like to share your testimonial:</p>
                     <div className="space-y-2">
                       {formData.allowedTypes.map(type => (
                         <div key={type} className="flex items-center p-3 border border-border rounded-md hover:bg-muted/50 cursor-pointer">

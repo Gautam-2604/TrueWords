@@ -9,14 +9,13 @@ export default function HeroSection() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    const handleMouseMove = (e: any) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+  const handleMouseMove = (e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
+  window.addEventListener("mousemove", handleMouseMove);
+  return () => window.removeEventListener("mousemove", handleMouseMove);
+}, []);
   const isDark = theme === "dark";
 
   return (

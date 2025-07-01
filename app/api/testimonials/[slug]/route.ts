@@ -1,9 +1,9 @@
 import { dbConnect } from "@/lib/dbConnect";
 import { TestimonialForm } from "@/models/testimonialForm";
 import { TestimonialResponse } from "@/models/testimonialResponse";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: { url: string | URL; }, { params }: any) {
+export async function GET(request: NextRequest, { params }: {params:{slug: string}}) {
   try {
     await dbConnect();
 
@@ -25,10 +25,10 @@ export async function GET(request: { url: string | URL; }, { params }: any) {
       );
     }
 
-    const query: Record<string, any> = { form: form._id };
-    if (approvedOnly) {
-      query.approved = true;
-    }
+    const query: { form: typeof form._id; approved?: boolean } = { form: form._id };
+if (approvedOnly) {
+  query.approved = true;
+}
 
     const skip = (page - 1) * limit;
 
