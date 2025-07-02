@@ -14,7 +14,14 @@ const SignUpPage = () => {
     confirmPassword: ''
   });
   const router = useRouter()
-  const [errors, setErrors] = useState({});
+  type Errors = {
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    terms?: string;
+  };
+  const [errors, setErrors] = useState<Errors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -27,7 +34,7 @@ const SignUpPage = () => {
 };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Errors = {};
     
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
