@@ -5,13 +5,13 @@ import { CustomFormData } from '@/common/types';
 
 export async function GET(
   request: NextRequest,
-  context: {params:{slug: string}}
+  context: {params: Promise<{slug: string}>}
 ) {
   try {
     // Connect to database
     await dbConnect();
     
-    const { slug } = context.params;
+    const { slug } = await context.params;
     
     if (!slug) {
       return NextResponse.json(
@@ -71,13 +71,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context:{params:{slug: string}}
+  context: {params: Promise<{slug: string}>}
 ) {
   try {
     // Connect to database
     await dbConnect();
     
-    const { slug } = context.params;
+    const { slug } = await context.params;
     
     if (!slug) {
       return NextResponse.json(
@@ -249,13 +249,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context:{params:{slug: string}}
+  context: {params: Promise<{slug: string}>}
 ) {
   try {
     // Connect to database
     await dbConnect();
     
-    const { slug } = context.params;
+    const { slug } = await context.params;
     
     if (!slug) {
       return NextResponse.json(
