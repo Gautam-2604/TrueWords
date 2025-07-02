@@ -171,7 +171,7 @@ const OrganizationDetail = () => {
 
   const getAverageRating = () => {
     const approvedTestimonials = testimonials.filter(t => t.status === 'approved');
-    if (approvedTestimonials.length === 0) return 0;
+    if (approvedTestimonials.length === 0) return '0.0';
     const sum = approvedTestimonials.reduce((acc, t) => acc + t.rating, 0);
     return (sum / approvedTestimonials.length).toFixed(1);
   };

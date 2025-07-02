@@ -70,7 +70,7 @@ const TestimonialDisplay = () => {
       setPagination(data.data.pagination);
       
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ const TestimonialDisplay = () => {
       // Refresh testimonials
       fetchTestimonials(pagination.currentPage);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -108,7 +108,7 @@ const TestimonialDisplay = () => {
       
       fetchTestimonials(pagination.currentPage);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -134,7 +134,7 @@ const TestimonialDisplay = () => {
       setBulkAction('');
       fetchTestimonials(pagination.currentPage);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -166,7 +166,6 @@ const TestimonialDisplay = () => {
   // Effects
   useEffect(() => {
     fetchTestimonials();
-    fetchStats();
   }, [filters]);
 
   useEffect(() => {
