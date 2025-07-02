@@ -36,6 +36,7 @@ export async function GET(
 
     // Transform the data for client consumption
     const transformedForm = {
+      //@ts-ignore
       _id: form._id.toString(),
       title: form.title,
       description: (form as unknown as CustomFormData).description,
@@ -187,6 +188,7 @@ export async function PUT(
 
     // Transform the data for client consumption
     const transformedForm = {
+      //@ts-ignore
       _id: updatedForm._id.toString(),
       title: updatedForm.title,
       description: updatedForm.description,
