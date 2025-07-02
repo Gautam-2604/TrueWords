@@ -4,6 +4,7 @@ import { Organization, ProcessedTestimonialForm } from "@/lib/types";
 import { Copy, ExternalLink, Eye, FileText, MoreVertical, Plus, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CustomFormData } from "@/common/types";
 
 const FormsDashboard = () => {
   const [selectedOrg, setSelectedOrg] = useState('');
@@ -51,16 +52,19 @@ const FormsDashboard = () => {
     
     if (responseData.data && Array.isArray(responseData.data)) {
       
-      formsArray = responseData.data.reduce((allForms: any, orgData: { forms: any[]; organizationName: any; }) => {
-        if (orgData.forms && Array.isArray(orgData.forms)) {
-          const formsWithOrgName = orgData.forms.map((form: any) => ({
-            ...form,
-            organizationName: orgData.organizationName
-          }));
-          return [...allForms, ...formsWithOrgName];
-        }
-        return allForms;
-      }, []);
+     formsArray = responseData.data.reduce(
+  (allForms: CustomFormData[], orgData: { forms: CustomFormData[]; organizationName: string }) => {
+    if (orgData.forms && Array.isArray(orgData.forms)) {
+      const formsWithOrgName = orgData.forms.map((form: CustomFormData) => ({
+        ...form,
+        organizationName: orgData.organizationName
+      }));
+      return [...allForms, ...formsWithOrgName];
+    }
+    return allForms;
+  },
+  []
+);
     } else if (Array.isArray(responseData)) {
       // Handle if API returns direct array
       formsArray = responseData;
@@ -127,7 +131,7 @@ const FormsDashboard = () => {
     });
   };
 
-  const getTypeIcons = (types: any[]) => {
+  const getTypeIcons = (types: string[]) => {
     if (!Array.isArray(types)) return '';
     
     const iconMap = {

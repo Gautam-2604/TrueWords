@@ -90,7 +90,7 @@ export default function FormDetailsPage() {
             {error || 'Form not found'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            The form you're looking for doesn't exist or has been removed.
+            The form you are looking for does not exist or has been removed.
           </p>
           <button 
             onClick={() => window.history.back()}
@@ -189,7 +189,7 @@ function MyComponent() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id as 'overview' | 'embed' | 'responses')}
                     className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 dark:text-blue-400'

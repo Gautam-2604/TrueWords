@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, Play, User, Quote } from 'lucide-react';
+import {  ChevronLeft, ChevronRight, Play, User, Quote } from 'lucide-react';
 import { CustomFormData, TestimonialResponse } from '@/common/types';
 
 const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBaseUrl: string}) => {
