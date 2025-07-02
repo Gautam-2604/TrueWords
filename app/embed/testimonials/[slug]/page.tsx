@@ -1,5 +1,5 @@
 'use client'
-import TestimonialsDisplay from "@/components/TestimonialDisplay";
+import TestimonialsDisplay from "../../components/TestimonialDisplay";
 import { useParams } from "next/navigation";
 
 export default function EmbedPage() {

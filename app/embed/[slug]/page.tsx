@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { notFound } from 'next/navigation'
-import TestimonialForm from '@/components/TestimonialForm'
-import EmbedWrapper from '@/components/EmbedWrapper'
+import TestimonialEmbed from '../components/TestimonialForm'
+import EmbedWrapper from '../components/EmbedWrapper'
 
 interface EmbedPageProps {
   params: Promise<{
@@ -91,7 +91,7 @@ export default function EmbedPage({ params }: EmbedPageProps) {
 
   return (
     <EmbedWrapper>
-      <TestimonialForm 
+      <TestimonialEmbed
         form={form}
       />
     </EmbedWrapper>
