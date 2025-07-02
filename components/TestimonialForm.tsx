@@ -123,6 +123,7 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error('Error submitting testimonial:', error);
+    //@ts-expect-error: some error
     alert(error.message || 'Failed to submit testimonial. Please try again.');
   } finally {
     setIsSubmitting(false);
