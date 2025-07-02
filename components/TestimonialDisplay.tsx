@@ -41,6 +41,7 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBas
         throw new Error(data.error || 'Failed to load testimonials');
       }
     } catch (err) {
+      //@ts-expect-error: some error
       setError(err.message);
     } finally {
       setLoading(false);
@@ -129,7 +130,7 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBas
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
         {testimonials.map((testimonial) => (
           <div
-            key={testimonial._id}
+            key={testimonial._id.toString()}
             className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer border border-gray-100 hover:border-indigo-200"
             onClick={() => openModal(testimonial)}
           >
