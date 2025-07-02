@@ -1,21 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse} from 'next/server';
 import { dbConnect } from '@/lib/dbConnect';
 import { TestimonialForm } from '@/models/testimonialForm';
 import { CustomFormData } from '@/common/types';
 
-interface RouteParams {
-  params: { slug: string };
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: {params:{slug: string}}
 ) {
   try {
     // Connect to database
     await dbConnect();
     
-    const { slug } = params;
+    const { slug } = context.params;
     
     if (!slug) {
       return NextResponse.json(
@@ -75,13 +71,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: RouteParams 
+  context:{params:{slug: string}}
 ) {
   try {
     // Connect to database
     await dbConnect();
     
-    const { slug } = params;
+    const { slug } = context.params;
     
     if (!slug) {
       return NextResponse.json(
@@ -253,13 +249,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }:RouteParams
+  context:{params:{slug: string}}
 ) {
   try {
     // Connect to database
     await dbConnect();
     
-    const { slug } = params;
+    const { slug } = context.params;
     
     if (!slug) {
       return NextResponse.json(
