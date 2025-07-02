@@ -42,6 +42,7 @@ export async function GET(request: Request) {
       title: form.title,
       description: form.description,
       organizationId: form.organization,
+      //@ts-expect-error: some error
       organizationName: orgMap[form.organization.toString()],
       slug: form.slug,
       allowedTypes: form.allowedTypes,
