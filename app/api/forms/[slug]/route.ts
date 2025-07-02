@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/dbConnect';
 import { TestimonialForm } from '@/models/testimonialForm';
+import { CustomFormData } from '@/common/types';
 
 interface RouteParams {
   params: { slug: string };
@@ -41,7 +42,7 @@ export async function GET(
     const transformedForm = {
       _id: form._id.toString(),
       title: form.title,
-      description: (form as any).description,
+      description: (form as unknown as CustomFormData).description,
       slug: form.slug,
       allowedTypes: form.allowedTypes,
       branding: {
@@ -221,12 +222,12 @@ export async function PUT(
       typeof error === 'object' &&
       error !== null &&
       'name' in error &&
-      (error as any).name === 'ValidationError'
+      (error as { name: string }).name === 'ValidationError'
     ) {
-      const validationErrors = Object.values((error as any).errors).map((err: any) => err.message);
+      const validationErrors = Object.values((error as unknown as { errors: Record<string, { message: string }> }).errors).map((err) => err.message);
       return NextResponse.json(
-        { error: 'Validation failed', details: validationErrors },
-        { status: 400 }
+      { error: 'Validation failed', details: validationErrors },
+      { status: 400 }
       );
     }
     
@@ -235,11 +236,11 @@ export async function PUT(
       typeof error === 'object' &&
       error !== null &&
       'code' in error &&
-      (error as any).code === 11000
+      (error as { code: number }).code === 11000
     ) {
       return NextResponse.json(
-        { error: 'A form with this slug already exists' },
-        { status: 409 }
+      { error: 'A form with this slug already exists' },
+      { status: 409 }
       );
     }
 
