@@ -19,20 +19,21 @@ const SignInPage = () => {
     password: "",
   });
   const {signIn} = useAuth()
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    //@ts-expect-error: some error
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: { email?: string; password?: string } = {};
 
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
