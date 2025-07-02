@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/dbConnect';
 import { TestimonialForm } from '@/models/testimonialForm';
 
+interface RouteParams {
+  params: { slug: string };
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: RouteParams
 ) {
   try {
     // Connect to database
@@ -26,7 +30,7 @@ export async function GET(
     .populate('organization', 'name email')
     .lean();
 
-    if (!form) {
+    if (!form || Array.isArray(form)) {
       return NextResponse.json(
         { error: 'Form not found' },
         { status: 404 }
@@ -37,7 +41,7 @@ export async function GET(
     const transformedForm = {
       _id: form._id.toString(),
       title: form.title,
-      description: form.description,
+      description: (form as any).description,
       slug: form.slug,
       allowedTypes: form.allowedTypes,
       branding: {
@@ -70,7 +74,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: RouteParams 
 ) {
   try {
     // Connect to database
@@ -177,7 +181,7 @@ export async function PUT(
     .populate('organization', 'name email')
     .lean();
 
-    if (!updatedForm) {
+    if (!updatedForm || Array.isArray(updatedForm)) {
       return NextResponse.json(
         { error: 'Form not found' },
         { status: 404 }
@@ -213,8 +217,13 @@ export async function PUT(
     console.error('Error updating form:', error);
     
     // Handle mongoose validation errors
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'name' in error &&
+      (error as any).name === 'ValidationError'
+    ) {
+      const validationErrors = Object.values((error as any).errors).map((err: any) => err.message);
       return NextResponse.json(
         { error: 'Validation failed', details: validationErrors },
         { status: 400 }
@@ -222,7 +231,12 @@ export async function PUT(
     }
     
     // Handle duplicate key errors
-    if (error.code === 11000) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as any).code === 11000
+    ) {
       return NextResponse.json(
         { error: 'A form with this slug already exists' },
         { status: 409 }
@@ -238,7 +252,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }:RouteParams
 ) {
   try {
     // Connect to database
