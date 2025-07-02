@@ -3,11 +3,11 @@ import { TestimonialForm } from "@/models/testimonialForm";
 import { TestimonialResponse } from "@/models/testimonialResponse";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: {params:{slug: string}}) {
+export async function GET(request: NextRequest, { params }: {params:Promise<{slug: string}>}) {
   try {
     await dbConnect();
 
-    const { slug } = params;
+    const { slug } = await params;
     const { searchParams } = new URL(request.url);
     
     const page = parseInt(searchParams.get('page') || '1');
