@@ -149,7 +149,7 @@ const FormsDashboard = () => {
 
   const copyEmbedCode = (slug: string) => {
     const embedCode = `<div id="testimonial-form-${slug}"></div>
-<script src="https://your-domain.com/embed.js" data-form="${slug}"></script>`;
+<script src="https://true-words.vercel.app/embed.js" data-form="${slug}"></script>`;
     navigator.clipboard.writeText(embedCode);
   };
 
