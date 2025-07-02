@@ -31,6 +31,7 @@ export async function GET(request: Request) {
 
     // Create a map for quick organization lookup
     const orgMap = orgs.reduce((acc, org) => {
+      //@ts-expect-error: some error
       acc[org._id.toString()] = org.name;
       return acc;
     }, {});
