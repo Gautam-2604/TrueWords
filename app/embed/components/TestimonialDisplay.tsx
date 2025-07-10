@@ -23,39 +23,54 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }:{slug: string, apiBas
   }, [slug, currentPage]);
 
   const fetchTestimonials = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${apiBaseUrl}/testimonials/${slug}?page=${currentPage}&limit=9&approved=true`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch testimonials');
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setTestimonials(data.data.testimonials);
-        setForm(data.data.form);
-        setPagination(data.data.pagination);
-      } else {
-        throw new Error(data.error || 'Failed to load testimonials');
-      }
-    } catch (err) {
-      //@ts-expect-error: some error
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const response = await fetch(`${apiBaseUrl}/testimonials/${slug}`);
 
-  // const renderStars = (rating = 5) => {
-  //   return Array.from({ length: 5 }, (_, i) => (
-  //     <Star
-  //       key={i}
-  //       className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-  //     />
-  //   ));
-  // };
+    if (!response.ok) {
+      throw new Error('Failed to fetch testimonials');
+    }
+
+    const data = await response.json();
+    console.log(data, "Data - - - - - - -- - -  - - - -");
+
+    // Set testimonials - validate the shape just like in fetchFormData
+    if (Array.isArray(data.testimonials)) {
+      setTestimonials(data.testimonials);
+    } else if (data.testimonials && typeof data.testimonials === 'object') {
+      if (Array.isArray(data.testimonials.data)) {
+        setTestimonials(data.testimonials.data);
+      } else if (Array.isArray(data.testimonials.testimonials)) {
+        setTestimonials(data.testimonials.testimonials);
+      } else {
+        setTestimonials([data.testimonials]);
+      }
+    } else {
+      setTestimonials([]);
+    }
+
+    // Set form and pagination with checks
+    if (data.data?.form) {
+      setForm(data.data.form);
+    } else {
+      console.warn("Form data is missing in response");
+    }
+
+    if (data.data?.pagination) {
+      setPagination(data.data.pagination);
+    }
+
+  } catch (err) {
+    //@ts-expect-error: some error
+    setError(err.message);
+    setTestimonials([]);  // fallback to empty
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  
 
   const openModal = (testimonial: TestimonialResponse) => {
     setSelectedTestimonial(testimonial);

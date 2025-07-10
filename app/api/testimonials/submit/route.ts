@@ -7,7 +7,6 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { dbConnect } from '@/lib/dbConnect';
 
-
 const uploadDir = './public/uploads/testimonials';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     
-    // Extract form fields
     const formId = formData.get('formId');
     const name = formData.get('name');
     const email = formData.get('email');
@@ -47,11 +45,9 @@ export async function POST(request: NextRequest) {
     const testimonial = formData.get('testimonial');
     const rating = formData.get('rating');
     
-    // Get uploaded files
     const imageFile = formData.get('image');
     const videoFile = formData.get('video');
 
-    // Validate required fields
     if (!formId || !name || !email || !testimonial) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -59,7 +55,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the form exists and is active
     const form = await TestimonialForm.findById(formId);
     if (!form || !form.isActive) {
       return NextResponse.json(
@@ -67,13 +62,13 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+    console.log("Form", form);
+    
 
-    // Handle file uploads
     let imageUrl = null;
     let videoUrl = null;
 
     if (imageFile instanceof File && imageFile.size > 0) {
-      // Convert File to formidable-like object for processing
       const buffer = Buffer.from(await imageFile.arrayBuffer());
       const tempPath = path.join(uploadDir, `temp_${uuidv4()}`);
       await fs.promises.writeFile(tempPath, buffer);
@@ -126,6 +121,12 @@ export async function POST(request: NextRequest) {
     });
 
     await testimonialResponse.save();
+    console.log(form.responsesCount);
+    
+    form.responsesCount = (form.responsesCount || 0) + 1;
+    console.log(form.responsesCount, "Response");
+    
+    await form.save();
 
     return NextResponse.json({
       success: true,
