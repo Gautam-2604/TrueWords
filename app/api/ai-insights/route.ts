@@ -47,8 +47,8 @@ ${testimonials}
 });
 
 
-    //@ts-expect-error
-    //Some changes I expect
+    // @ts-expect-error: The Google GenAI SDK response type may not accurately define the structure
+    // of `candidates[0].content.parts[0].text`, but we know from observed responses that this field exists.
     const text = resp.candidates[0].content?.parts?.[0]?.text || "";
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -68,8 +68,9 @@ ${testimonials}
       analyzedCount: testimonials.split(" | ").length,
       timestamp: new Date().toISOString(),
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error:", err);
+    //@ts-expect-error: Any removed
     const msg = err.message || "";
     if (msg.includes("Invalid API key")) {
       return NextResponse.json({ error: "Invalid API key" }, { status: 500 });
