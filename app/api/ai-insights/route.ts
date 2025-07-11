@@ -48,6 +48,7 @@ ${testimonials}
 
 
     //@ts-expect-error
+    //Some changes I expect
     const text = resp.candidates[0].content?.parts?.[0]?.text || "";
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);

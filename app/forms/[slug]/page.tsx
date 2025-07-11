@@ -592,7 +592,7 @@ function MyComponent() {
                       className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
                     >
                       <p className="text-gray-900 dark:text-gray-100 mb-2">
-                        "{testimonial.text}"
+                        &quot;{testimonial.text}&quot;
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         — {testimonial.name}
@@ -651,7 +651,7 @@ function MyComponent() {
                       Powered by Google Gemini AI
                     </p>
                     <p className="text-gray-800 dark:text-gray-200">
-                      Our AI analyzes your testimonials to identify the most important pain points and highlight your best features. Click "Generate Insights" to get started.
+                      Our AI analyzes your testimonials to identify the most important pain points and highlight your best features. Click &quot;Generate Insights&quot; to get started.
                     </p>
                   </div>
 
