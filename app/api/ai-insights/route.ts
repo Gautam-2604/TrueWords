@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY, // your Gemini Developer API key
-  // or for Vertex AI:
-  // vertexai: true,
-  // project: process.env.GCP_PROJECT,
-  // location: process.env.GCP_LOCATION,
+  apiKey: process.env.GEMINI_API_KEY, 
 });
 
 export async function POST(request: NextRequest) {
@@ -27,30 +23,31 @@ export async function POST(request: NextRequest) {
     }
 
     const resp = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      contents: [
+  model: "gemini-2.5-pro",
+  contents: [
+    {
+      role: "user",
+      parts: [
         {
-          role: "user",
-          parts: [
-            {
-              text: `
-You are an expert product analyst. Analyze these testimonials for "${formTitle}" and return valid JSON:
+          text: `
+You are an expert product analyst. Analyze these testimonials for ${formTitle} and return valid JSON with two fields:
 
 {
-  "painPoint": "...",
-  "bestFeature": "..."
+  "painPoint": "...",     // Key challenge or issue users mention
+  "bestFeature": "..."    // Most praised or valuable feature
 }
 
 Testimonials:
 ${testimonials}
-          `,
-            },
-          ],
+        `.trim(),
         },
       ],
-    });
+    },
+  ],
+});
 
-    //@ts-ignore
+
+    //@ts-expect-error
     const text = resp.candidates[0].content?.parts?.[0]?.text || "";
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
