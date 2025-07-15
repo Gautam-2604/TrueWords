@@ -80,15 +80,8 @@ export default function FormDetailsPage() {
     "overview" | "embed" | "responses" | "ai-review"
   >("overview");
   const [copiedType, setCopiedType] = useState<string | null>(null);
-  // const [aiInsights, setAiInsights] = useState<AIInsight>({
-  //   painPoint: "",
-  //   bestFeature: "",
-  //   isLoading: false,
-  // });
-
   const [aiInsights, setAiInsights] = useState<DetailedInsights | null>(null);
 const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
-const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (slug) {
@@ -113,6 +106,9 @@ const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
 
       const data = await response.json();
       setForm(data);
+
+      console.log(testimonialsResponse, "Repsonsen3ejfefjqbhecvhvgfcheqvw");
+      
 
       // Handle testimonials response
       if (testimonialsResponse.ok) {
@@ -160,24 +156,28 @@ const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
     
     // Prepare testimonial text for analysis
     const testimonialTexts = testimonials.map(t => t.text).join(" | ");
+    console.log(testimonials, "Testimonials");
+    
+    const videos = testimonials.map(t=>t.videoUrl).join(" | ")
     formData.append('testimonials', testimonialTexts);
     formData.append('formTitle', form?.title || "Product/Service");
+    formData.append('videourl', videos)
     
-    // Add video file if selected
-    if (selectedVideoFile) {
-      formData.append('video', selectedVideoFile);
-    }
 
     const response = await fetch("/api/ai-insights", {
       method: "POST",
       body: formData, // Changed from JSON to FormData
     });
 
+    
+
     if (!response.ok) {
       throw new Error("Failed to generate AI insights");
     }
 
     const data: DetailedInsights = await response.json();
+    console.log(data, "Data");
+    
     setAiInsights(data);
     toast.success("AI insights generated successfully!");
   } catch (error) {
@@ -188,25 +188,6 @@ const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
   }
 };
 
-const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
-  if (file) {
-    // Check file size (50MB limit)
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error("Video file must be less than 50MB");
-      return;
-    }
-    
-    const allowedTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/webm'];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Unsupported video format. Please use MP4, MOV, AVI, or WebM");
-      return;
-    }
-    
-    setSelectedVideoFile(file);
-    toast.success(`Video "${file.name}" selected for analysis`);
-  }
-};
 
   const copyToClipboard = async (text: string, type: string) => {
     try {
@@ -680,21 +661,7 @@ function MyComponent() {
         </h2>
       </div>
       <div className="flex items-center gap-3">
-        {/* Video Upload */}
-        <label className="cursor-pointer">
-          <input
-            type="file"
-            accept="video/mp4,video/mov,video/avi,video/webm"
-            onChange={handleVideoUpload}
-            className="hidden"
-          />
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            {selectedVideoFile ? selectedVideoFile.name : "Add Video"}
-          </div>
-        </label>
+       
         
         <button
           onClick={generateAIInsights}
@@ -730,27 +697,7 @@ function MyComponent() {
       </div>
     ) : (
       <div className="space-y-6">
-        {/* Video Selection Status */}
-        {selectedVideoFile && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm text-blue-800 dark:text-blue-200">
-                Video selected: {selectedVideoFile.name} ({(selectedVideoFile.size / (1024 * 1024)).toFixed(1)}MB)
-              </span>
-              <button
-                onClick={() => setSelectedVideoFile(null)}
-                className="ml-auto text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
+        
 
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">

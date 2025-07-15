@@ -162,79 +162,83 @@ export default function TestimonialEmbed({ form }: TestimonialEmbedProps) {
   }
 
   const handleSubmit = async () => {
-    // Validate required fields
-    if (!name.trim() || !email.trim() || !testimonial.trim()) {
-      alert('Please fill in all required fields')
-      return
-    }
-
-    // Check if any files are still uploading
-    const stillUploading = uploadedFiles.some(file => file.uploading)
-    if (stillUploading) {
-      alert('Please wait for all files to finish uploading')
-      return
-    }
-
-    // Check if any files failed to upload
-    const failedUploads = uploadedFiles.some(file => file.error)
-    if (failedUploads) {
-      alert('Some files failed to upload. Please remove them and try again.')
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // Prepare the data with file URLs instead of actual files
-      const submitData = {
-        formId: form._id,
-        name: name.trim(),
-        email: email.trim(),
-        testimonial: testimonial.trim(),
-        rating: rating,
-        company: company.trim() || undefined,
-        imageUrls: uploadedFiles
-          .filter(file => file.file.type.startsWith('image/') && file.url)
-          .map(file => file.url!),
-        videoUrls: uploadedFiles
-          .filter(file => file.file.type.startsWith('video/') && file.url)
-          .map(file => file.url!)
-      }
-
-      // Submit to API
-      const response = await fetch('/api/testimonials/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submitData),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit testimonial')
-      }
-
-      setIsSubmitted(true)
-      
-      if (window.parent !== window) {
-        window.parent.postMessage({
-          type: 'testimonial_submitted',
-          data: { 
-            formSlug: form.slug,
-            testimonialId: result.id
-          }
-        }, '*')
-      }
-
-    } catch (error) {
-      console.error('Error submitting testimonial:', error)
-      alert(error instanceof Error ? error.message : 'Failed to submit testimonial. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
+  // Validate required fields
+  if (!name.trim() || !email.trim() || !testimonial.trim()) {
+    alert('Please fill in all required fields');
+    return;
   }
+
+  // Check if any files are still uploading
+  const stillUploading = uploadedFiles.some(file => file.uploading);
+  if (stillUploading) {
+    alert('Please wait for all files to finish uploading');
+    return;
+  }
+
+  // Check if any files failed to upload
+  const failedUploads = uploadedFiles.some(file => file.error);
+  if (failedUploads) {
+    alert('Some files failed to upload. Please remove them and try again.');
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const formData = new FormData();
+
+    // Append basic fields
+    formData.append('formId', form._id);
+    formData.append('name', name.trim());
+    formData.append('email', email.trim());
+    formData.append('testimonial', testimonial.trim());
+    formData.append('rating', rating.toString());
+    formData.append('company', company.trim());
+
+    // Append first image URL (if exists)
+    const imageUrl = uploadedFiles.find(file =>
+      file.file.type.startsWith('image/') && file.url
+    )?.url;
+    if (imageUrl) formData.append('imageUrl', imageUrl);
+
+    // Append first video URL (if exists)
+    const videoUrl = uploadedFiles.find(file =>
+      file.file.type.startsWith('video/') && file.url
+    )?.url;
+    if (videoUrl) formData.append('videoUrl', videoUrl);
+
+    // Send to API
+    const response = await fetch('/api/testimonials/submit', {
+      method: 'POST',
+      body: formData, // DO NOT set Content-Type manually
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to submit testimonial');
+    }
+
+    setIsSubmitted(true);
+
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        type: 'testimonial_submitted',
+        data: {
+          formSlug: form.slug,
+          testimonialId: result.id
+        }
+      }, '*');
+    }
+
+  } catch (error) {
+    console.error('Error submitting testimonial:', error);
+    alert(error instanceof Error ? error.message : 'Failed to submit testimonial. Please try again.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   if (isSubmitted) {
     return (

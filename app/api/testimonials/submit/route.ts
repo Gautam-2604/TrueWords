@@ -37,6 +37,8 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const formData = await request.formData();
+    console.log(formData);
+    
     
     const formId = formData.get('formId');
     const name = formData.get('name');
@@ -45,8 +47,11 @@ export async function POST(request: NextRequest) {
     const testimonial = formData.get('testimonial');
     const rating = formData.get('rating');
     
-    const imageFile = formData.get('image');
-    const videoFile = formData.get('video');
+    const imageFile = formData.get('imageurl');
+    const videoFile = formData.get('videoUrl');
+
+    console.log(videoFile, "VideoFile");
+    
 
     if (!formId || !name || !email || !testimonial) {
       return NextResponse.json(
@@ -65,36 +70,7 @@ export async function POST(request: NextRequest) {
     console.log("Form", form);
     
 
-    let imageUrl = null;
-    let videoUrl = null;
-
-    if (imageFile instanceof File && imageFile.size > 0) {
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const tempPath = path.join(uploadDir, `temp_${uuidv4()}`);
-      await fs.promises.writeFile(tempPath, buffer);
-      
-      const fileObj = {
-        filepath: tempPath,
-        originalFilename: imageFile.name,
-        mimetype: imageFile.type
-      };
-      
-      imageUrl = await handleFileUpload(fileObj);
-    }
-
-    if (videoFile instanceof File && videoFile.size > 0) {
-      const buffer = Buffer.from(await videoFile.arrayBuffer());
-      const tempPath = path.join(uploadDir, `temp_${uuidv4()}`);
-      await fs.promises.writeFile(tempPath, buffer);
-      
-      const fileObj = {
-        filepath: tempPath,
-        originalFilename: videoFile.name,
-        mimetype: videoFile.type
-      };
-      
-      videoUrl = await handleFileUpload(fileObj);
-    }
+   
 
     // Get client metadata
     const userAgent = request.headers.get('user-agent') || '';
@@ -111,14 +87,16 @@ export async function POST(request: NextRequest) {
       company: typeof company === 'string' ? company.trim() : undefined,
       text: typeof testimonial === 'string' ? testimonial.trim() : '',
       rating: typeof rating === 'string' ? parseInt(rating) : undefined,
-      imageUrl,
-      videoUrl,
       approved: false, // Default to false for moderation
+      videoUrl: videoFile,
       metadata: {
         userAgent,
         ipAddress
       }
     });
+
+    console.log(testimonialResponse, "Repsonse");
+    
 
     await testimonialResponse.save();
     console.log(form.responsesCount);
