@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { TestimonialResponse } from '@/models/testimonialResponse'; 
 import { TestimonialForm } from '@/models/testimonialForm';
 import fs from 'fs';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import { dbConnect } from '@/lib/dbConnect';
 
 const uploadDir = './public/uploads/testimonials';
@@ -12,26 +10,6 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-
-async function handleFileUpload(file: { filepath: string; originalFilename: string; mimetype?: string; }) {
-  if (!file) return null;
-
-  const fileExtension = path.extname(file.originalFilename || '');
-  const fileName = `${uuidv4()}${fileExtension}`;
-  const uploadPath = path.join(uploadDir, fileName);
-
-  try {
-    // Move file from temp location to upload directory
-    await fs.promises.copyFile(file.filepath, uploadPath);
-    await fs.promises.unlink(file.filepath); // Clean up temp file
-    
-    // Return the public URL
-    return `/uploads/testimonials/${fileName}`;
-  } catch (error) {
-    console.error('File upload error:', error);
-    throw error;
-  }
-}
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
@@ -46,8 +24,6 @@ export async function POST(request: NextRequest) {
     const company = formData.get('company');
     const testimonial = formData.get('testimonial');
     const rating = formData.get('rating');
-    
-    const imageFile = formData.get('imageurl');
     const videoFile = formData.get('videoUrl');
 
     console.log(videoFile, "VideoFile");

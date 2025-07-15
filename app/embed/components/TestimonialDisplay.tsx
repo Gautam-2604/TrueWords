@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Play, User, Quote, Pause, Volume2, VolumeX, Maximize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, User, Quote, Pause, Volume2, VolumeX } from 'lucide-react';
 import { CustomFormData, TestimonialResponse } from '@/common/types';
 
 const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }: { slug: string, apiBaseUrl: string }) => {
@@ -90,21 +90,6 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }: { slug: string, apiB
     }));
   };
 
-  const handleVideoPlay = (testimonialId: string) => {
-    const video = videoRefs.current[testimonialId];
-    if (video) {
-      video.play();
-      updateVideoState(testimonialId, { isPlaying: true });
-    }
-  };
-
-  const handleVideoPause = (testimonialId: string) => {
-    const video = videoRefs.current[testimonialId];
-    if (video) {
-      video.pause();
-      updateVideoState(testimonialId, { isPlaying: false });
-    }
-  };
 
   const handleVideoToggle = (testimonialId: string) => {
     const video = videoRefs.current[testimonialId];

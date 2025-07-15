@@ -18,12 +18,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { CustomFormData, TestimonialResponse } from "@/common/types";
 
-interface AIInsight {
-  painPoint: string;
-  bestFeature: string;
-  isLoading: boolean;
-}
-
 interface VideoAnalysis {
   emotionalTone: string;
   bodyLanguage: string;
@@ -81,7 +75,7 @@ export default function FormDetailsPage() {
   >("overview");
   const [copiedType, setCopiedType] = useState<string | null>(null);
   const [aiInsights, setAiInsights] = useState<DetailedInsights | null>(null);
-const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+  const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -94,7 +88,7 @@ const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
       setLoading(true);
       const response = await fetch(`/api/forms/${slug}`);
       const testimonialsResponse = await fetch(`/api/testimonials/${slug}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           setError("Form not found");
@@ -107,18 +101,14 @@ const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
       const data = await response.json();
       setForm(data);
 
-      console.log(testimonialsResponse, "Repsonsen3ejfefjqbhecvhvgfcheqvw");
-      
-
-      // Handle testimonials response
       if (testimonialsResponse.ok) {
         const testimonialData = await testimonialsResponse.json();
         console.log(testimonialData, "Testimonials");
-        
+
         // Ensure testimonialData is an array
         if (Array.isArray(testimonialData)) {
           setTestimonials(testimonialData);
-        } else if (testimonialData && typeof testimonialData === 'object') {
+        } else if (testimonialData && typeof testimonialData === "object") {
           // If it's an object with a data property or similar structure
           if (Array.isArray(testimonialData.data)) {
             setTestimonials(testimonialData.data);
@@ -144,50 +134,46 @@ const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   };
 
   const generateAIInsights = async () => {
-  if (testimonials.length === 0) {
-    toast.error("No testimonials to analyze");
-    return;
-  }
-
-  setIsGeneratingInsights(true);
-
-  try {
-    const formData = new FormData();
-    
-    // Prepare testimonial text for analysis
-    const testimonialTexts = testimonials.map(t => t.text).join(" | ");
-    console.log(testimonials, "Testimonials");
-    
-    const videos = testimonials.map(t=>t.videoUrl).join(" | ")
-    formData.append('testimonials', testimonialTexts);
-    formData.append('formTitle', form?.title || "Product/Service");
-    formData.append('videourl', videos)
-    
-
-    const response = await fetch("/api/ai-insights", {
-      method: "POST",
-      body: formData, // Changed from JSON to FormData
-    });
-
-    
-
-    if (!response.ok) {
-      throw new Error("Failed to generate AI insights");
+    if (testimonials.length === 0) {
+      toast.error("No testimonials to analyze");
+      return;
     }
 
-    const data: DetailedInsights = await response.json();
-    console.log(data, "Data");
-    
-    setAiInsights(data);
-    toast.success("AI insights generated successfully!");
-  } catch (error) {
-    console.error("Error generating AI insights:", error);
-    toast.error("Failed to generate AI insights. Please try again.");
-  } finally {
-    setIsGeneratingInsights(false);
-  }
-};
+    setIsGeneratingInsights(true);
 
+    try {
+      const formData = new FormData();
+
+      // Prepare testimonial text for analysis
+      const testimonialTexts = testimonials.map((t) => t.text).join(" | ");
+      console.log(testimonials, "Testimonials");
+
+      const videos = testimonials.map((t) => t.videoUrl).join(" | ");
+      formData.append("testimonials", testimonialTexts);
+      formData.append("formTitle", form?.title || "Product/Service");
+      formData.append("videourl", videos);
+
+      const response = await fetch("/api/ai-insights", {
+        method: "POST",
+        body: formData, // Changed from JSON to FormData
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate AI insights");
+      }
+
+      const data: DetailedInsights = await response.json();
+      console.log(data, "Data");
+
+      setAiInsights(data);
+      toast.success("AI insights generated successfully!");
+    } catch (error) {
+      console.error("Error generating AI insights:", error);
+      toast.error("Failed to generate AI insights. Please try again.");
+    } finally {
+      setIsGeneratingInsights(false);
+    }
+  };
 
   const copyToClipboard = async (text: string, type: string) => {
     try {
@@ -346,7 +332,13 @@ function MyComponent() {
                   <button
                     key={tab.id}
                     onClick={() =>
-                      setActiveTab(tab.id as "overview" | "embed" | "responses" | "ai-review")
+                      setActiveTab(
+                        tab.id as
+                          | "overview"
+                          | "embed"
+                          | "responses"
+                          | "ai-review"
+                      )
                     }
                     className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                       activeTab === tab.id
@@ -633,7 +625,7 @@ function MyComponent() {
               ) : (
                 <div className="space-y-4">
                   {testimonials.map((testimonial, index) => (
-                    <div 
+                    <div
                       key={testimonial._id?.toString() || index}
                       className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
                     >
@@ -649,322 +641,441 @@ function MyComponent() {
               )}
             </div>
           )}
-
-          // Replace the entire AI Review tab content with this enhanced version
-{activeTab === "ai-review" && (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-3">
-        <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          AI-Powered Insights
-        </h2>
-      </div>
-      <div className="flex items-center gap-3">
-       
-        
-        <button
-          onClick={generateAIInsights}
-          disabled={isGeneratingInsights || testimonials.length === 0}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isGeneratingInsights ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Brain className="w-4 h-4" />
-              Generate Insights
-            </>
-          )}
-        </button>
-      </div>
-    </div>
-
-    {testimonials.length === 0 ? (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Brain className="w-8 h-8 text-gray-400" />
-        </div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-          No testimonials to analyze
-        </h3>
-        <p className="text-gray-600 dark:text-gray-400">
-          Collect some testimonials first to get AI-powered insights
-        </p>
-      </div>
-    ) : (
-      <div className="space-y-6">
-        
-
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-            Powered by Google Gemini AI
-          </p>
-          <p className="text-gray-800 dark:text-gray-200">
-            Our AI analyzes your testimonials to provide comprehensive insights including sentiment analysis, user segmentation, and competitive advantages. Upload a video for even deeper analysis.
-          </p>
-        </div>
-
-        {aiInsights && (
-          <div className="space-y-6">
-            {/* Metadata */}
-            {aiInsights.metadata && (
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>Analyzed {aiInsights.metadata.analyzedCount} testimonials</span>
-                  <span>Score: {(aiInsights.metadata.avgSentimentScore * 100).toFixed(0)}%</span>
-                  {aiInsights.metadata.hasVideoAnalysis && (
-                    <span className="text-purple-600 dark:text-purple-400">+ Video Analysis</span>
-                  )}
+          {activeTab === "ai-review" && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    AI-Powered Insights
+                  </h2>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={generateAIInsights}
+                    disabled={isGeneratingInsights || testimonials.length === 0}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGeneratingInsights ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="w-4 h-4" />
+                        Generate Insights
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-            )}
 
-            {/* Primary Insights */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6 border border-red-200 dark:border-red-700">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center flex-shrink-0">
-                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+              {testimonials.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Brain className="w-8 h-8 text-gray-400" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2">
-                      Primary Pain Point
-                    </h3>
-                    <p className="text-red-800 dark:text-red-200 text-sm leading-relaxed">
-                      {aiInsights.painPoint}
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    No testimonials to analyze
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Collect some testimonials first to get AI-powered insights
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      Powered by Google Gemini AI
+                    </p>
+                    <p className="text-gray-800 dark:text-gray-200">
+                      Our AI analyzes your testimonials to provide comprehensive
+                      insights including sentiment analysis, user segmentation,
+                      and competitive advantages. Upload a video for even deeper
+                      analysis.
                     </p>
                   </div>
-                </div>
-              </div>
 
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-700">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Star className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
-                      Best Feature
-                    </h3>
-                    <p className="text-green-800 dark:text-green-200 text-sm leading-relaxed">
-                      {aiInsights.bestFeature}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sentiment Analysis */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Sentiment Analysis
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Overall: {aiInsights.sentiment.overall}</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-green-600 dark:text-green-400">Positive</span>
-                    <span>{aiInsights.sentiment.positive}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full" 
-                      style={{ width: `${aiInsights.sentiment.positive}%` }}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-red-600 dark:text-red-400">Negative</span>
-                    <span>{aiInsights.sentiment.negative}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-red-500 h-2 rounded-full" 
-                      style={{ width: `${aiInsights.sentiment.negative}%` }}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Neutral</span>
-                    <span>{aiInsights.sentiment.neutral}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-gray-500 h-2 rounded-full" 
-                      style={{ width: `${aiInsights.sentiment.neutral}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Themes Analysis */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Theme Analysis
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">Usability</h4>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{aiInsights.themes.usability}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">Performance</h4>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{aiInsights.themes.performance}</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">Support</h4>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{aiInsights.themes.support}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">Pricing</h4>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{aiInsights.themes.pricing}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* User Segments */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                User Segments
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <h4 className="font-medium text-blue-600 dark:text-blue-400 text-sm mb-2">Beginners</h4>
-                  <ul className="space-y-1">
-                    {aiInsights.userSegments.beginners.map((feedback, idx) => (
-                      <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">• {feedback}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium text-purple-600 dark:text-purple-400 text-sm mb-2">Advanced</h4>
-                  <ul className="space-y-1">
-                    {aiInsights.userSegments.advanced.map((feedback, idx) => (
-                      <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">• {feedback}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium text-green-600 dark:text-green-400 text-sm mb-2">Business</h4>
-                  <ul className="space-y-1">
-                    {aiInsights.userSegments.business.map((feedback, idx) => (
-                      <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">• {feedback}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Video Analysis */}
-            {aiInsights.videoAnalysis && (
-              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-700">
-                <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  Video Analysis
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Emotional Tone</h4>
-                      <p className="text-purple-800 dark:text-purple-200 text-sm">{aiInsights.videoAnalysis.emotionalTone}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Body Language</h4>
-                      <p className="text-purple-800 dark:text-purple-200 text-sm">{aiInsights.videoAnalysis.bodyLanguage}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Speech Pattern</h4>
-                      <p className="text-purple-800 dark:text-purple-200 text-sm">{aiInsights.videoAnalysis.speechPattern}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Credibility Score</h4>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-purple-200 dark:bg-purple-800 rounded-full h-2">
-                          <div 
-                            className="bg-purple-600 h-2 rounded-full" 
-                            style={{ width: `${aiInsights.videoAnalysis.credibilityScore * 10}%` }}
-                          />
+                  {aiInsights && (
+                    <div className="space-y-6">
+                      {/* Metadata */}
+                      {aiInsights.metadata && (
+                        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                            <span>
+                              Analyzed {aiInsights.metadata.analyzedCount}{" "}
+                              testimonials
+                            </span>
+                            <span>
+                              Score:{" "}
+                              {(
+                                aiInsights.metadata.avgSentimentScore * 100
+                              ).toFixed(0)}
+                              %
+                            </span>
+                            {aiInsights.metadata.hasVideoAnalysis && (
+                              <span className="text-purple-600 dark:text-purple-400">
+                                + Video Analysis
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <span className="text-sm text-purple-800 dark:text-purple-200">
-                          {aiInsights.videoAnalysis.credibilityScore}/10
-                        </span>
+                      )}
+
+                      {/* Primary Insights */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6 border border-red-200 dark:border-red-700">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center flex-shrink-0">
+                              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2">
+                                Primary Pain Point
+                              </h3>
+                              <p className="text-red-800 dark:text-red-200 text-sm leading-relaxed">
+                                {aiInsights.painPoint}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-700">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Star className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
+                                Best Feature
+                              </h3>
+                              <p className="text-green-800 dark:text-green-200 text-sm leading-relaxed">
+                                {aiInsights.bestFeature}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sentiment Analysis */}
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                          Sentiment Analysis
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              Overall: {aiInsights.sentiment.overall}
+                            </span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-green-600 dark:text-green-400">
+                                Positive
+                              </span>
+                              <span>{aiInsights.sentiment.positive}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                              <div
+                                className="bg-green-500 h-2 rounded-full"
+                                style={{
+                                  width: `${aiInsights.sentiment.positive}%`,
+                                }}
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-red-600 dark:text-red-400">
+                                Negative
+                              </span>
+                              <span>{aiInsights.sentiment.negative}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                              <div
+                                className="bg-red-500 h-2 rounded-full"
+                                style={{
+                                  width: `${aiInsights.sentiment.negative}%`,
+                                }}
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600 dark:text-gray-400">
+                                Neutral
+                              </span>
+                              <span>{aiInsights.sentiment.neutral}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                              <div
+                                className="bg-gray-500 h-2 rounded-full"
+                                style={{
+                                  width: `${aiInsights.sentiment.neutral}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Themes Analysis */}
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                          Theme Analysis
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                                Usability
+                              </h4>
+                              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                {aiInsights.themes.usability}
+                              </p>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                                Performance
+                              </h4>
+                              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                {aiInsights.themes.performance}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                                Support
+                              </h4>
+                              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                {aiInsights.themes.support}
+                              </p>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                                Pricing
+                              </h4>
+                              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                {aiInsights.themes.pricing}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* User Segments */}
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                          User Segments
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <h4 className="font-medium text-blue-600 dark:text-blue-400 text-sm mb-2">
+                              Beginners
+                            </h4>
+                            <ul className="space-y-1">
+                              {aiInsights.userSegments.beginners.map(
+                                (feedback, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="text-sm text-gray-600 dark:text-gray-400"
+                                  >
+                                    • {feedback}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-purple-600 dark:text-purple-400 text-sm mb-2">
+                              Advanced
+                            </h4>
+                            <ul className="space-y-1">
+                              {aiInsights.userSegments.advanced.map(
+                                (feedback, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="text-sm text-gray-600 dark:text-gray-400"
+                                  >
+                                    • {feedback}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-green-600 dark:text-green-400 text-sm mb-2">
+                              Business
+                            </h4>
+                            <ul className="space-y-1">
+                              {aiInsights.userSegments.business.map(
+                                (feedback, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="text-sm text-gray-600 dark:text-gray-400"
+                                  >
+                                    • {feedback}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Video Analysis */}
+                      {aiInsights.videoAnalysis && (
+                        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-700">
+                          <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                            Video Analysis
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                              <div>
+                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
+                                  Emotional Tone
+                                </h4>
+                                <p className="text-purple-800 dark:text-purple-200 text-sm">
+                                  {aiInsights.videoAnalysis.emotionalTone}
+                                </p>
+                              </div>
+                              <div>
+                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
+                                  Body Language
+                                </h4>
+                                <p className="text-purple-800 dark:text-purple-200 text-sm">
+                                  {aiInsights.videoAnalysis.bodyLanguage}
+                                </p>
+                              </div>
+                              <div>
+                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
+                                  Speech Pattern
+                                </h4>
+                                <p className="text-purple-800 dark:text-purple-200 text-sm">
+                                  {aiInsights.videoAnalysis.speechPattern}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="space-y-3">
+                              <div>
+                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
+                                  Credibility Score
+                                </h4>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex-1 bg-purple-200 dark:bg-purple-800 rounded-full h-2">
+                                    <div
+                                      className="bg-purple-600 h-2 rounded-full"
+                                      style={{
+                                        width: `${
+                                          aiInsights.videoAnalysis
+                                            .credibilityScore * 10
+                                        }%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-sm text-purple-800 dark:text-purple-200">
+                                    {aiInsights.videoAnalysis.credibilityScore}
+                                    /10
+                                  </span>
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
+                                  Engagement Level
+                                </h4>
+                                <p className="text-purple-800 dark:text-purple-200 text-sm">
+                                  {aiInsights.videoAnalysis.engagementLevel}
+                                </p>
+                              </div>
+                              <div>
+                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
+                                  Demographics
+                                </h4>
+                                <p className="text-purple-800 dark:text-purple-200 text-sm">
+                                  {aiInsights.videoAnalysis.demographicInsights}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          {aiInsights.videoAnalysis.keyMoments.length > 0 && (
+                            <div className="mt-4">
+                              <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm mb-2">
+                                Key Moments
+                              </h4>
+                              <ul className="space-y-1">
+                                {aiInsights.videoAnalysis.keyMoments.map(
+                                  (moment, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="text-sm text-purple-800 dark:text-purple-200"
+                                    >
+                                      • {moment}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Improvements & Advantages */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-6 border border-orange-200 dark:border-orange-700">
+                          <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-3">
+                            Suggested Improvements
+                          </h3>
+                          <ul className="space-y-2">
+                            {aiInsights.improvements.map((improvement, idx) => (
+                              <li
+                                key={idx}
+                                className="text-sm text-orange-800 dark:text-orange-200"
+                              >
+                                • {improvement}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-700">
+                          <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
+                            Competitive Advantages
+                          </h3>
+                          <ul className="space-y-2">
+                            {aiInsights.competitiveAdvantages.map(
+                              (advantage, idx) => (
+                                <li
+                                  key={idx}
+                                  className="text-sm text-blue-800 dark:text-blue-200"
+                                >
+                                  • {advantage}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Engagement Level</h4>
-                      <p className="text-purple-800 dark:text-purple-200 text-sm">{aiInsights.videoAnalysis.engagementLevel}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Demographics</h4>
-                      <p className="text-purple-800 dark:text-purple-200 text-sm">{aiInsights.videoAnalysis.demographicInsights}</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
-                {aiInsights.videoAnalysis.keyMoments.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm mb-2">Key Moments</h4>
-                    <ul className="space-y-1">
-                      {aiInsights.videoAnalysis.keyMoments.map((moment, idx) => (
-                        <li key={idx} className="text-sm text-purple-800 dark:text-purple-200">• {moment}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Improvements & Advantages */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-6 border border-orange-200 dark:border-orange-700">
-                <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-3">
-                  Suggested Improvements
-                </h3>
-                <ul className="space-y-2">
-                  {aiInsights.improvements.map((improvement, idx) => (
-                    <li key={idx} className="text-sm text-orange-800 dark:text-orange-200">
-                      • {improvement}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-700">
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
-                  Competitive Advantages
-                </h3>
-                <ul className="space-y-2">
-                  {aiInsights.competitiveAdvantages.map((advantage, idx) => (
-                    <li key={idx} className="text-sm text-blue-800 dark:text-blue-200">
-                      • {advantage}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-)}
+          )}
         </div>
       </div>
     </div>
   );
-  
 }
