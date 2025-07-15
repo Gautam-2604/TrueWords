@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.844.0",
+    "@aws-sdk/s3-request-presigner": "^3.844.0",
     "@google/genai": "^1.9.0",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
