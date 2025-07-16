@@ -46,6 +46,11 @@ export async function POST(request: NextRequest) {
     const testimonials = formData.get('testimonials') as string;
     const formTitle = formData.get('formTitle') as string;
     const videoFile = formData.get('video') as File | null;
+    let orgBusiness = formData.get('orgBusiness')
+
+    if(!orgBusiness || orgBusiness==""){
+      orgBusiness = "no specific business given"
+    }
 
     if (!testimonials?.trim()) {
       return NextResponse.json(
@@ -93,7 +98,7 @@ export async function POST(request: NextRequest) {
     const parts = [
       {
         text: `
-You are an expert product analyst and UX researcher. Analyze these testimonials for "${formTitle}" and return valid JSON with detailed insights.
+You are an expert product analyst and UX researcher. Analyze these testimonials for "${formTitle}" and a "${orgBusiness}" business and return valid JSON with detailed insights.
 
 Return this exact JSON structure:
 {
@@ -125,7 +130,6 @@ Testimonials: ${testimonials}
       },
     ];
 
-    // Add video part if available
     if (videoPart) {
       parts.push(videoPart);
     }
@@ -156,7 +160,6 @@ Testimonials: ${testimonials}
       );
     }
 
-    // Calculate additional metrics
     const testimonialCount = testimonials.split(" | ").length;
     const avgSentiment = insights.sentiment ? 
       (insights.sentiment.positive - insights.sentiment.negative) / 100 : 0;

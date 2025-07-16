@@ -10,6 +10,7 @@ const OrganizationsDashboard = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
+  const [orgbusiness, setOrgbusiness] = useState('')
   const {user} = useAuth()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false);
@@ -17,12 +18,7 @@ const OrganizationsDashboard = () => {
   
 useEffect(() => {
   if (!user?.id) return;
-  
-  console.log("Starting");
-  
   const getOrgs = async() => {
-    console.log("Starting 2");
-    
     const response = await fetch(`/api/organization?userId=${user.id}`, {
       method: 'GET',
       headers: {
@@ -30,9 +26,6 @@ useEffect(() => {
       }
     });
     const data = await response.json();
-    console.log(data, "Data");
-    
-    
     setOrganizations(Array.isArray(data.orgs) ? data.orgs : []);
   };
 
@@ -48,7 +41,7 @@ useEffect(() => {
         headers:{
             'Content-Type':'application/json'
         },
-        body: JSON.stringify({name: newOrgName, owner:user?.id, member:[{user:user?.id, role:'admin'}]})
+        body: JSON.stringify({name: newOrgName, owner:user?.id, member:[{user:user?.id, role:'admin'}], business:orgbusiness})
     })
     if (response.ok) {
           toast.success('Organization Created Successfully');
@@ -233,6 +226,19 @@ useEffect(() => {
                     value={newOrgName}
                     onChange={(e) => setNewOrgName(e.target.value)}
                     placeholder="Enter organization name"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    What is your business ??
+                  </label>
+                  <input
+                    type="text"
+                    value={orgbusiness}
+                    onChange={(e) => setOrgbusiness(e.target.value)}
+                    placeholder="Enter organization business"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
                     autoFocus
                   />

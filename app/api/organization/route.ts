@@ -39,16 +39,9 @@ export async function GET(request: Request) {
     if (!userId) {
       return NextResponse.json({ message: 'No User' }, { status: 400 });
     }
-
-    console.log(userId, "UserId");
-    
-
     await dbConnect();
 
     const organizations = await Organization.find({ owner: userId });
-    console.log(organizations, "Orgs");
-    
-
     return NextResponse.json(
       { message: 'Organizations fetched successfully.', orgs: organizations },
       { status: 200 }

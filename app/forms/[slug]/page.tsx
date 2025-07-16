@@ -83,6 +83,8 @@ export default function FormDetailsPage() {
     }
   }, [slug]);
 
+  let orgBusiness = ""
+
   const fetchFormData = async () => {
     try {
       setLoading(true);
@@ -99,6 +101,8 @@ export default function FormDetailsPage() {
       }
 
       const data = await response.json();
+      orgBusiness = data.organization.business
+      
       setForm(data);
 
       if (testimonialsResponse.ok) {
@@ -152,6 +156,7 @@ export default function FormDetailsPage() {
       formData.append("testimonials", testimonialTexts);
       formData.append("formTitle", form?.title || "Product/Service");
       formData.append("videourl", videos);
+      formData.append("orgBusiness", orgBusiness||"")
 
       const response = await fetch("/api/ai-insights", {
         method: "POST",
@@ -714,11 +719,7 @@ function MyComponent() {
                               ).toFixed(0)}
                               %
                             </span>
-                            {aiInsights.metadata.hasVideoAnalysis && (
-                              <span className="text-purple-600 dark:text-purple-400">
-                                + Video Analysis
-                              </span>
-                            )}
+                          
                           </div>
                         </div>
                       )}
@@ -923,114 +924,7 @@ function MyComponent() {
                         </div>
                       </div>
 
-                      {/* Video Analysis */}
-                      {aiInsights.videoAnalysis && (
-                        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-700">
-                          <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                              />
-                            </svg>
-                            Video Analysis
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-3">
-                              <div>
-                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
-                                  Emotional Tone
-                                </h4>
-                                <p className="text-purple-800 dark:text-purple-200 text-sm">
-                                  {aiInsights.videoAnalysis.emotionalTone}
-                                </p>
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
-                                  Body Language
-                                </h4>
-                                <p className="text-purple-800 dark:text-purple-200 text-sm">
-                                  {aiInsights.videoAnalysis.bodyLanguage}
-                                </p>
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
-                                  Speech Pattern
-                                </h4>
-                                <p className="text-purple-800 dark:text-purple-200 text-sm">
-                                  {aiInsights.videoAnalysis.speechPattern}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="space-y-3">
-                              <div>
-                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
-                                  Credibility Score
-                                </h4>
-                                <div className="flex items-center gap-2">
-                                  <div className="flex-1 bg-purple-200 dark:bg-purple-800 rounded-full h-2">
-                                    <div
-                                      className="bg-purple-600 h-2 rounded-full"
-                                      style={{
-                                        width: `${
-                                          aiInsights.videoAnalysis
-                                            .credibilityScore * 10
-                                        }%`,
-                                      }}
-                                    />
-                                  </div>
-                                  <span className="text-sm text-purple-800 dark:text-purple-200">
-                                    {aiInsights.videoAnalysis.credibilityScore}
-                                    /10
-                                  </span>
-                                </div>
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
-                                  Engagement Level
-                                </h4>
-                                <p className="text-purple-800 dark:text-purple-200 text-sm">
-                                  {aiInsights.videoAnalysis.engagementLevel}
-                                </p>
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">
-                                  Demographics
-                                </h4>
-                                <p className="text-purple-800 dark:text-purple-200 text-sm">
-                                  {aiInsights.videoAnalysis.demographicInsights}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          {aiInsights.videoAnalysis.keyMoments.length > 0 && (
-                            <div className="mt-4">
-                              <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm mb-2">
-                                Key Moments
-                              </h4>
-                              <ul className="space-y-1">
-                                {aiInsights.videoAnalysis.keyMoments.map(
-                                  (moment, idx) => (
-                                    <li
-                                      key={idx}
-                                      className="text-sm text-purple-800 dark:text-purple-200"
-                                    >
-                                      • {moment}
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      
 
                       {/* Improvements & Advantages */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
