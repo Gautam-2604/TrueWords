@@ -319,7 +319,7 @@ const TestimonialsDisplay = ({ slug, apiBaseUrl = '/api' }: { slug: string, apiB
               {currentTestimonial.text && (
                 <div className="mb-8 text-center">
                   <p className="text-gray-700 leading-relaxed text-xl md:text-2xl font-light italic">
-                    "{currentTestimonial.text}"
+                    {currentTestimonial.text}
                   </p>
                 </div>
               )}
